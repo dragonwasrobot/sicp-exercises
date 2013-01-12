@@ -395,7 +395,126 @@ circumference
 
 ;; 1.2 Procedures and the Processes They Generate
 
+;; local evolution, global
 
+;; 1.2.1 Linear Recursion and Iteration
 
+;; n! = n * (n - 1) * (n - 2) * ... * 3 * 2 * 1
+
+;; n! = n * [(n - 1) * (n - 2) * ... * 3 * 2 * 1] = n * (n - 1)!
+
+(define (factorial n)
+	(if (= n 1)
+			1
+			(* n (factorial (- n 1)))))
+
+;; product <- counter * product
+;; counter <- counter + 1
+
+(define (factorial n)
+	(fact-iter 1 1 n))
+(define (fact-iter product counter max-count)
+	(if (> counter max-count)
+			product
+			(fact-iter (* counter product)
+								 (+ counter 1)
+								 max-count)))
+
+;; deferred operations, recursive process, linear recursive process, iterative
+;; process, state variables, linear iterative process, stack, process,
+;; procedure, tail-recursive
+
+;; Exercise 1.9
+
+;; (define (+ a b)
+;; 	(if (= a 0) b (inc (+ (dec a) b))))
+;; recursive
+
+;; (define (+ a b)
+;; 	(if (= a 0) b (+ (dec a) (inc b))))
+;; iterative
+
+;; TODO
+
+;; Exercise 1.10
+
+(define (A x y)
+	(cond ((= y 0) 0)
+				((= x 0) (* 2 y))
+				((= y 1) 2)
+				(else (A (- x 1) (A x (- y 1))))))
+
+(A 1 10)
+;; 1024
+(A 2 4)
+;; 65536
+(A 3 3)
+;; 65536
+
+(define (f n) (A 0 n))
+;; f compute 2*n
+(define (g n) (A 1 n))
+;; g computes 2^n
+(h 1)
+(define (h n) (A 2 n))
+;; h computes 2^2^n
+
+;; 1.2.2 Tree Recursion
+
+;; tree recursion
+
+;; 0,1,1,2,3,5,8,13,21,...
+
+;;          / 0                   if n = 0,
+;; Fib(n) = | 1                   if n = 1,
+;;          \ Fib(n-1) + Fib(n-2) otherwise.
+
+(define (fib n)
+	(cond ((= n 0) 0)
+				((= n 1) 1)
+				(else (+ (fib (- n 1))
+								 (fib (- n 2))))))
+
+(fib 8)
+;; 21
+
+;; a <- a + b
+;; b <- a
+
+(define (fib n)
+	(fib-iter 1 0 n))
+(define (fib-iter a b count)
+	(if (= count 0)
+			b
+			(fib-iter (+ a b) a (- count 1))))
+
+(fib 8)
+
+;; Example: Counting change
+
+(define (count-change amount)
+	(cc amount 5))
+
+(define (cc amount kinds-of-coins)
+	(cond ((= amount 0) 1)
+				 ((or (< amount 0) (= kinds-of-coins 0)) 0)
+				 (else (+ (cc amount
+											(- kinds-of-coins 1))
+									(cc (- amount
+												 (first-demonination
+													kinds-of-coins))
+											kinds-of-coins)))))
+
+(define (first-demonination kinds-of-coins)
+	(cond ((= kinds-of-coins 1) 1)
+				((= kinds-of-coins 2) 5)
+				((= kinds-of-coins 3) 10)
+				((= kinds-of-coins 4) 25)
+				((= kinds-of-coins 5) 50)))
+
+(count-change 100)
+;; 292
+
+;; tabulation/memoization,
 
 ;; end-of-1-building-abstractions-with-procedures.scm
