@@ -517,4 +517,98 @@ circumference
 
 ;; tabulation/memoization,
 
+;; Exercise 1.11
+
+(define (f n)
+	(cond ((< n 3) n)
+				(else (+ (f (- n 1))
+								 (* 2 (f (- n 2)))
+								 (* 3 (f (- n 3)))))))
+
+;; ==> 0, 1, 2, 4, 11, 25, 59, 142, 335, 796, 892
+
+;; TODO f-iter
+
+;; Exercise 1.12
+
+(define (binomial n k)
+	(cond ((= k 0) 1)
+				((= n 0) 0)
+				(else
+				 (+ (binomial (- n 1) (- k 1))
+						(binomial (- n 1) k)))))
+
+(binomial 4 2)
+;; ==> 6
+
+;; Exercise 1.13
+
+;; TODO
+
+;; 1.2.3 Orders of Growth
+
+;; order of growth, Theta(f(n))
+
+;; Exercise 1.14
+
+;; TODO
+
+;; Exercise 1.15
+
+(define (cube x)
+	(* x x x))
+
+(define (p x)
+	(- (* 3 x) (* 4 (cube x))))
+
+(define (sine angle)
+	(if (not (> (abs angle) 0.1))
+			angle
+			(p (sine (/ angle 3.0)))))
+
+(sine 12.15)
+;; a. 5 times: 12.15 -> 4.05 -> 1.34999 -> 0.44999 -> 0.14999 -> 0.04999
+
+;; b. (ceiling (/ (log (/ a 0.1)) (log 3)))
+
+;; 1.2.4 Exponentiation
+
+;; b^n = b * b^(n-1)
+;; b^0 = 1
+
+(define (expt b n)
+	(if (= n 0)
+			1
+			(* b (expt b (- n 1)))))
+
+(expt 2 5)
+;; 32
+
+(define (expt b n)
+	(expt-iter b n 1))
+(define (expt-iter b counter product)
+	(if (= counter 0)
+			product
+			(expt-iter b
+								 (- counter 1)
+								 (* b product))))
+
+(expt 2 5)
+;; 32
+
+(define (fast-expt b n)
+	(cond ((= n 0) 1)
+				((even? n) (square (fast-expt b (/ n 2))))
+				(else (* b (fast-expt b (- n 1))))))
+
+(fast-expt 2 5)
+;; 32
+
+;; (define (even? n)
+;; 	(= (remainder n 2) 0))
+
+;; Exercise 1.16
+
+
+
 ;; end-of-1-building-abstractions-with-procedures.scm
