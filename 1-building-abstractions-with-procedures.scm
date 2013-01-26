@@ -609,6 +609,191 @@ circumference
 
 ;; Exercise 1.16
 
+;; invariant quantity
+
+(define (fast-expt-aux b n)
+	(define (iter a b n)
+		(cond ((= n 0) a)
+					((even? n) (iter a (square b) (/ n 2)))
+					(else (iter (* a b) b (- n 1)))))
+	(iter 1 b n))
+
+(fast-expt 2 5) ;; 32
+(fast-expt-aux 2 5) ;; 32
+
+;; Exercise 1.17
+
+(define (mult a b)
+	(if (= b 0)
+			0
+			(+ a (mult a (- b 1)))))
+
+(define (double n)
+	(if (= n 0)
+			0
+			(+ 2 (double (- n 1)))))
+
+(double 17) ;; 34
+
+(define (halve n)
+	(define (iter a n)
+		(cond ((= n 0) a)
+					((= n 1) a)
+					(else (iter (+ 1 a) (- n 2)))))
+	(iter 0 n))
+
+(halve 34) ; 17
+
+(define (fast-mult b n)
+	(cond ((= n 0) 0)
+				((even? n) (double (fast-mult b (halve n))))
+				(else (+ b (fast-mult b (- n 1))))))
+
+(fast-mult 7 8) ; 56
+
+;; Exercise 1.18
+
+(define (russian-peasant b n)
+	(define (iter a b n)
+		(cond ((= n 0) a)
+					((even? n) (iter a (double b) (/ n 2)))
+					(else (iter (+ a b) b (- n 1)))))
+	(iter 0 b n))
+
+(russian-peasant 4 7) ; 28
+
+;; Exercise 1.19
+
+;; a' <- bq + aq + ap = (p + q)a + bq
+;; b' <- bp + aq
+;; a'' <- b'q + a'q + a'p = (bp + aq)q + ((p+q)a + bq)q + ((p+q)a + bq)p
+;;                        = bpq + aq^2 + apq aq^2 + bq^2 + ap^2 + apq + bpq
+;;                        = (2q^2 + 2pq + p^2)a + (2pq + q^2)b
+;; b'' <- b'p + a'q = (bp + aq)p + ((p+q)a + bq)q
+;;                  = bp^2 + apq + apq + aq^2 + bq^2
+;;                  = (2pq + q^2)a (p^2 + q^2)b
+
+(define (square x) (* x x))
+
+(define (fib n)
+	(fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+	(cond ((= count 0) b)
+				((even? count)
+				 (fib-iter a
+									 b
+									 (+ (square p) (square q))
+									 (+ (* 2 p q) (square q))
+									 (/ count 2)))
+				(else (fib-iter (+ (* b q) (* a q) (* a p))
+												(+ (* b p) (* a q))
+												p
+												q
+												(- count 1)))))
+
+(fib 0)
+(fib 1)
+(fib 2)
+(fib 3)
+(fib 4)
+(fib 5)
+(fib 6)
+
+;; 1.2.5 Greatest Common Divisor
+
+;; GCD(a,b) = GCD(b,r)
+
+;; GCD(206,40) = GCD(40,6)
+;;             = GCD(6,4)
+;;             = GCD(4,2)
+;;             = GCD(2,0)
+;;             = 2
+
+;; Euclid's Algorithm
+
+(define (gcd a b)
+	(if (= b 0)
+			a
+			(gcd b (remainder a b))))
+
+;; Lame's Theorem: If Euclid's Algorithm requires $k$ steps to compute the GCD
+;; of some pair, then the smaller number in the pair must be greater than or
+;; equal to the $k^{th}$ Fibonacci number.
+
+;; Exercise 1.20
+
+;; TODO
+
+;; 1.2.6 Example: Testing for Primality
+
+;; Searching for divisors
+
+(define (smallest-divisor n)
+	(find-divisor n 2))
+(define (find-divisor n test-divisor)
+	(cond ((> (square test-divisor) n) n)
+				((divides? test-divisor n) test-divisor)
+				(else (find-divisor n (+ test-divisor 1)))))
+(define (divides? a b) (= (remainder b a) 0))
+(define (prime? n)
+	(= n (smallest-divisor n)))
+
+(prime? 8)
+(prime? 13)
+
+;; The Fermat test
+
+;; Fermat's Little Theorem: If $n$ is a prime number and $a$ is any positive
+;; integer less than $n$, then $a$ raised to the $n^{th}$ power is congruent to
+;; $a$ modulo $n$.
+
+(define (expmod base exp m)
+	(cond ((= exp 0)
+				 1)
+				((even? exp)
+				 (remainder
+					(square
+					 (expmod base (/ exp 2) m))
+					m))
+				(else
+				 (remainder
+					(* base
+						 (expmod base (- exp 1) m))
+					m))))
+
+(expmod 4 5 5)
+
+;; our poorly implemented random function
+(define (random n)
+	(/ n 2))
+
+(define (fermat-test n)
+	(define (try-it a)
+		(= (expmod a n n) a))
+	(try-it (+ 1 (random (- n 1)))))
+
+(define (fast-prime? n times)
+	(cond ((= times 0) #t)
+				((fermat-test n) (fast-prime? n (- times 1)))
+				(else #f)))
+
+(fast-prime? 13 1)
+
+;; Probabilistic methods
+
+;; Carmichael numbers: those that fool the Fermat test.
+
+;; Probabilistic algorithms.
+
+;; Exercise 1.21
+
+(smallest-divisor 199) ;; 199
+(smallest-divisor 1999) ;; 1999
+(smallest-divisor 19999) ;; 7
+
+;; Exercise 1.22
+
 
 
 ;; end-of-1-building-abstractions-with-procedures.scm
