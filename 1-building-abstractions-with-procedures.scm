@@ -1,6 +1,6 @@
 ;; 1-building-abstractions-with-procedures.scm
 
-;; 1 Building Abstractions with Procedures
+;; # 1 Building Abstractions with Procedures
 
 ;; computational process
 ;; data
@@ -55,7 +55,7 @@
 (+ (* 3 5) (- 10 6))
 ;; 19
 
-(+ (* 3 (+  (* 2 4) (+ 3 5))) (+ (- 10 7) 6))
+(+ (* 3 (+	(* 2 4) (+ 3 5))) (+ (- 10 7) 6))
 ;; 57
 
 (+ (* 3
@@ -145,8 +145,8 @@ circumference
 
 ;; (f 5)
 ;; (sum-of-squares (+ 5 1) (* 5 2))
-;; (+   (square (+ 5 1))      (square (* 5 2))  )
-;; (+   (* (+ 5 1) (+ 5 1))   (* (* 5 2) (* 5 2)))
+;; (+		(square (+ 5 1))			(square (* 5 2))	)
+;; (+		(* (+ 5 1) (+ 5 1))		(* (* 5 2) (* 5 2)))
 ;; (+ (* 6 6) (* 10 10))
 ;; (+ 36 100)
 ;; 136
@@ -164,9 +164,9 @@ circumference
 				((< x 0) (- x))))
 
 ;; (cond (<p_1> <e_1>)
-;;       (<p_2> <e_2>)
-;;       ...
-;;       (<p_n> <e_n>))
+;;			 (<p_2> <e_2>)
+;;			 ...
+;;			 (<p_n> <e_n>))
 
 ;; (<p> <e>)
 ;; clauses
@@ -303,9 +303,9 @@ circumference
 ;; 0
 
 ;; (define (sqrt-iter guess x)
-;; 	(new-if (good-enough? guess x)
-;; 					guess
-;; 					(sqrt-iter (improve guess x) x)))
+;;	(new-if (good-enough? guess x)
+;;					guess
+;;					(sqrt-iter (improve guess x) x)))
 
 ;; The program will loop infinitely because the predicate expression will only
 ;; be evaluated once (to false) resulting in a infinite loop since it won't be
@@ -427,11 +427,11 @@ circumference
 ;; Exercise 1.9
 
 ;; (define (+ a b)
-;; 	(if (= a 0) b (inc (+ (dec a) b))))
+;;	(if (= a 0) b (inc (+ (dec a) b))))
 ;; recursive
 
 ;; (define (+ a b)
-;; 	(if (= a 0) b (+ (dec a) (inc b))))
+;;	(if (= a 0) b (+ (dec a) (inc b))))
 ;; iterative
 
 ;; TODO
@@ -465,9 +465,9 @@ circumference
 
 ;; 0,1,1,2,3,5,8,13,21,...
 
-;;          / 0                   if n = 0,
-;; Fib(n) = | 1                   if n = 1,
-;;          \ Fib(n-1) + Fib(n-2) otherwise.
+;;					/ 0										if n = 0,
+;; Fib(n) = | 1										if n = 1,
+;;					\ Fib(n-1) + Fib(n-2) otherwise.
 
 (define (fib n)
 	(cond ((= n 0) 0)
@@ -605,7 +605,7 @@ circumference
 ;; 32
 
 ;; (define (even? n)
-;; 	(= (remainder n 2) 0))
+;;	(= (remainder n 2) 0))
 
 ;; Exercise 1.16
 
@@ -667,11 +667,11 @@ circumference
 ;; a' <- bq + aq + ap = (p + q)a + bq
 ;; b' <- bp + aq
 ;; a'' <- b'q + a'q + a'p = (bp + aq)q + ((p+q)a + bq)q + ((p+q)a + bq)p
-;;                        = bpq + aq^2 + apq aq^2 + bq^2 + ap^2 + apq + bpq
-;;                        = (2q^2 + 2pq + p^2)a + (2pq + q^2)b
+;;												= bpq + aq^2 + apq aq^2 + bq^2 + ap^2 + apq + bpq
+;;												= (2q^2 + 2pq + p^2)a + (2pq + q^2)b
 ;; b'' <- b'p + a'q = (bp + aq)p + ((p+q)a + bq)q
-;;                  = bp^2 + apq + apq + aq^2 + bq^2
-;;                  = (2pq + q^2)a (p^2 + q^2)b
+;;									= bp^2 + apq + apq + aq^2 + bq^2
+;;									= (2pq + q^2)a (p^2 + q^2)b
 
 (define (square x) (* x x))
 
@@ -705,10 +705,10 @@ circumference
 ;; GCD(a,b) = GCD(b,r)
 
 ;; GCD(206,40) = GCD(40,6)
-;;             = GCD(6,4)
-;;             = GCD(4,2)
-;;             = GCD(2,0)
-;;             = 2
+;;						 = GCD(6,4)
+;;						 = GCD(4,2)
+;;						 = GCD(2,0)
+;;						 = 2
 
 ;; Euclid's Algorithm
 
@@ -793,6 +793,390 @@ circumference
 (smallest-divisor 19999) ;; 7
 
 ;; Exercise 1.22
+
+;; TODO
+
+;; Exercise 1.23
+
+;; TODO
+
+;; Exercise 1.24
+
+;; TODO
+
+;; Exercise 1.25
+
+;; TODO
+
+;; Exercise 1.26
+
+;; TODO
+
+;; Exercise 1.27
+
+;; TODO
+
+;; Exercise 1.28
+
+;; TODO
+
+;; 1.3 Formulating Abstractions with Higher-Order Procedures
+
+(define (cube x) (* x x x))
+
+;; /higher order procedures/
+
+;; 1.3.1 Procedures as Arguments
+
+(define (sum-integers a b)
+	(if (> a b)
+			0
+			(+ a
+				 (sum-integers (+ a 1) b))))
+
+(define (sum-cubes a b)
+	(if (> a b)
+			0
+			(+ (cube a)
+				 (sum-cubes (+ a 1) b))))
+
+(define (pi-sum a b)
+	(if (> a b)
+			0
+			(+ (/ 1.0 (* a (+ a 2)))
+				 (pi-sum (+ a 4) b))))
+
+;; (define (<name> a b)
+;;		(if (> a b)
+;;				0
+;;				(+ (<term> a)
+;;					 (<name> (<next> a) b))))
+
+;; *summation of a series*
+
+(define (sum term a next b)
+	(if (> a b)
+			0
+			(+ (term a)
+				 (sum term (next a) next b))))
+
+(define (inc n) (+ n 1))
+
+(define (sum-cubes a b)
+	(sum cube a inc b))
+
+(sum-cubes 1 10)
+;; 3025
+
+(define (identity x) x)
+
+(define (sum-integers a b)
+	(sum identity a inc b))
+
+(sum-integers 1 10)
+;; 55
+
+(define (pi-sum a b)
+	(define (pi-term x)
+		(/ 1.0 (* x (+ x 2))))
+	(define (pi-next x)
+		(+ x 4))
+	(sum pi-term a pi-next b))
+
+(* 8 (pi-sum 1 1000))
+;; 3.139592655589783
+
+(define (integral f a b dx)
+	(define (add-dx x)
+		(+ x dx))
+	(* (sum f (+ a (/ dx 2.0)) add-dx b)
+		 dx))
+
+(integral cube 0 1 0.01)
+;; 0.24998750000000042
+
+(integral cube 0 1 0.001)
+;; 0.249999875000001
+
+;; Exercise 1.29
+
+;; TODO
+
+;; Exercise 1.30
+
+;; TODO
+
+;; Exercise 1.31
+
+;; TODO
+
+;; Exercise 1.32
+
+;; TODO
+
+;; Exercise 1.33
+
+;; TODO
+
+;; ### 1.3.2 Constructing Procedures Using Lambda
+
+(lambda (x) (+ x 4))
+
+(lambda (x) (/ 1.0 (* x (+ x 2))))
+
+(define (pi-sum a b)
+	(sum (lambda (x) (/ 1.0 (* x (+ x 2))))
+			 a
+			 (lambda (x) (+ x 4))
+			 b))
+
+(define (integral f a b dx)
+	(* (sum f
+					(+ a (/ dx 2.0))
+					(lambda (x) (+ x dx))
+					b)
+		 dx))
+
+;; (lambda (<formal-parameters>) <body>)
+
+(define (plus4 x) (+ x 4))
+
+(define plus4 (lambda (x) (+ x 4)))
+
+((lambda (x y z) (+ x y (square z)))
+ 1 2 3)
+
+;; #### Using let to create local variables
+
+(define (f x y)
+	(define (f-helper a b)
+		(+ (* x (square a))
+			 (* y b)
+			 (* a b)))
+	(f-helper (+ 1 (* x y))
+						(- 1 y)))
+
+(define (f x y)
+	((lambda (a b)
+		 (+ (* x (square a))
+				(* y b)
+				(* a b)))
+	 (+ 1 (* x y))
+	 (- 1 y)))
+
+(define (f x y)
+	(let ((a (+ 1 (* x y)))
+				(b (- 1 y)))
+		(+ (* x (square a))
+			 (* y b)
+			 (* a b))))
+
+;; (let ((<var_1> <exp_1>)
+;;			 (<var_2> <exp_2>)
+;;			 ...
+;;			 (<var_n> <exp_n>))
+;;		<body>)
+
+(define (f x y)
+	(define a (+ 1 (* x y)))
+	(define b (- 1 y))
+	(+ (* x (square a))
+		 (* y b)
+		 (* a b)))
+
+;; Exercise 1.34
+
+;; When we evaluate (f f), we get (lambda (g) (g 2) 2) resulting in
+;; (2 '(2)) which then results in an error as it tries to apply
+;; the value 2 to the function 2.
+
+;; ### 1.3.3 Procedures as General Methods
+
+;; #### Finding roots of equations by the half-interval method
+
+;; *half-interval method*.
+
+(define (search f neg-point pos-point)
+	(let ((midpoint (average neg-point pos-point)))
+		(if (close-enough? neg-point pos-point)
+				midpoint
+				(let ((test-value (f midpoint)))
+					(cond ((positive? test-value)
+								 (search f neg-point midpoint))
+								((negative? test-value)
+								 (search f midpoint pos-point))
+								(else midpoint))))))
+
+(define (close-enough? x y) (< (abs (- x y)) 0.001))
+
+(define (half-interval-method f a b)
+	(let ((a-value (f a))
+				(b-value (f b)))
+		(cond ((and (negative? a-value) (positive? b-value))
+					 (search f a b))
+					((and (negative? b-value) (positive? a-value))
+					 (search f b a))
+					(else (error "Values are not of opposite sign" a b)))))
+
+(half-interval-method sin 2.0 4.0)
+;; 3.14111328125
+
+(half-interval-method (lambda (x) (- (* x x x) (+ (* 2 x) 3)))
+											1.0
+											2.0)
+;; 1.89306640625
+
+;; #### Finding fixed points of functions
+
+;; *fixed point*
+
+(define tolerance 0.00001)
+
+(define (fixed-point f first-guess)
+	(define (close-enough? v1 v2)
+		(< (abs (- v1 v2))
+			 tolerance))
+	(define (try guess)
+		(let ((next (f guess)))
+			(if (close-enough? guess next)
+					next
+					(try next))))
+	(try first-guess))
+
+(fixed-point cos 1.0)
+;; 0.7390822985224023
+
+(fixed-point (lambda (y) (+ (sin y) (cos y))) 1.0)
+;; 1.2587315962971173
+
+(define (sqrt x) ; buggy
+	(fixed-point (lambda (y) (/ x y)) 1.0))
+
+(define (sqrt x)
+	(fixed-point (lambda (y) (average y (/ x y)) 1.0)))
+
+;; *average damping*
+
+;; Exercise 1.35
+
+;; Show that the golden ratio phi is a fixed point of the transformation
+;; x |-> 1 + 1 / x.
+
+;; phi = 1 + 1 / phi
+;; phi ^ 2 = phi + 1
+;; phi ^ 2 - phi - 1 = 0
+;;		 1 + sqrt 5												 1 - sqrt 5
+;; phi = ------- = 1.61803399887 and phi = ------- = -0.6180339897
+;;				2																2
+
+;;		 1 + sqrt 5
+;; phi = ------- = 1.61803399887...
+;;				2
+
+;; Use this fact to compute phi by means of the `fixed-point` procedure.
+
+;; golden ratio: phi = (/ (+ 1 (sqrt 5)) 2) = 1.6180339887...
+
+(define golden-ratio (fixed-point (lambda (y) (+ 1 (/ 1 y))) 1.0))
+;; 1.6180327868852458
+
+;; Exercise 1.36
+
+;; Modify `fixed-point` so that it prints the sequence of approximations it
+;; generates, using the `newline` and `display` primitives.
+
+(define (fixed-point f first-guess)
+	(define (close-enough? v1 v2)
+		(< (abs (- v1 v2))
+			 tolerance))
+	(define (try guess)
+		(display guess)
+		(newline)
+		(let ((next (f guess)))
+			(if (close-enough? guess next)
+					next
+					(try next))))
+	(try first-guess))
+
+((lambda () (fixed-point (lambda (y) (+ 1 (/ 1 y))) 1.0))) ; phi again
+
+(define x-power-x (fixed-point (lambda (y) (/ (log 1000) (log y))) 2.0))
+
+x-power-x
+;; 4.555532270803653
+
+;; Exercise 1.37
+
+;; a.
+
+;; *continued fraction*
+;; *k-term finite continued fraction*
+
+;; (/ N_1 (+ D_1 (/ N_2 (+ D_2 (...)))))
+
+(define (cont-frac-rec n d k)
+	(define (cont-rec i)
+		(if (= i k)
+				0
+				(/ (n i) (+ (d i) (cont-rec (+ i 1))))))
+	(cont-rec 0))
+
+;; golden ratio: 0.61803398875
+
+(cont-frac-rec (lambda (i) 1.0)
+							 (lambda (i) 1.0)
+							 11)
+;; 0.6180555555555556
+
+;; Accuracy of 4 decimals: k = 11.
+
+;; b.
+
+(define (cont-frac-iter n d k)
+	(define (cont-iter i a)
+		(if (= 0 i)
+				a
+				(cont-iter (- i 1) (/ (n i) (+ (d i) a)))))
+		(cont-iter k 0))
+
+(cont-frac-iter (lambda (i) 1.0)
+								(lambda (i) 1.0)
+								11)
+;; 0.6180555555555556
+
+;; Exercise 1.38
+
+(define (nat-log-series i)
+	(cond ((= i 0) 1)
+				((= i 1) 2)
+				(else (if (not (= (remainder (- i 1) 3) 0))
+									1
+									(+ (* (/ 2 3)
+												(- i 2))
+										 (/ 8 3))))))
+
+(define euler-e-frac
+	(+ 2 (cont-frac-rec (lambda (i) 1.0)
+											nat-log-series
+											10)))
+
+euler-e-frac
+;; 2.7182817182817183
+
+;; Exercise 1.39
+
+;; tan x = (/ x (- 1 (/ (square x) (- 3 (square x) (/ -5 ...)))))
+
+(define (tan-cf x k)
+	(cont-frac-rec (lambda (i) (if (= i 0)
+														(+ x 0.0)
+														(- (square (+ x 0.0)))))
+								 (lambda (i) (+ 1.0 (* 2 i)))
+								 k))
+
+(tan-cf 1 10)
+
+
 
 
 
