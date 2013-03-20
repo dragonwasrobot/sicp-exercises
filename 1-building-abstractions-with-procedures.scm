@@ -1,30 +1,11 @@
-;; 1-building-abstractions-with-procedures.scm
-
 ;; # 1 Building Abstractions with Procedures
 
-;; computational process
-;; data
-;; program
-;; programming language
-;; bugs/glitches
-;; debug
+;; #### Programming in Lisp
 
-;; Programming in Lisp
+;; ## 1.1 The Elements of Programming
 
-;; recursion equations
-;; interpreter
-;; procedures
+;; ### 1.1.1 Expressions
 
-;; 1.1 The Elements of Programming
-
-;; * primitive expressions
-;; * means of combination
-;; * means of abstraction
-
-;; 1.1.1 Expressions
-
-;; expression
-;; evaluating
 
 486
 ;; 486
@@ -39,18 +20,10 @@
 (+ 2.7 10)
 ;; 12.7
 
-;; combinations
-;; operators
-;; operands
-;; arguments
-;; prefix notation
-
 (+ 21 35 12 7)
 ;; 75
 (* 25 4 12)
 ;; 1200
-
-;; nested
 
 (+ (* 3 5) (- 10 6))
 ;; 19
@@ -65,15 +38,10 @@
 			6))
 ;; 57
 
-;; pretty-printing
-;; real-eval-print loop
-
-;; 1.1.2 Naming and the Environment
-
-;; variable
-;; value
+;; ### 1.1.2 Naming and the Environment
 
 (define size 2)
+
 size
 ;; 2
 (* 5 size)
@@ -87,27 +55,15 @@ size
 circumference
 ;; 62.8318
 
-;; environment
-;; global environment
-
-;; 1.1.3 Evaluating Combinations
-
-;; recursive
+;; ### 1.1.3 Evaluating Combinations
 
 (* (+ 2 (* 4 6))
 	 (+ 3 5 7))
 ;; 390
 
-;; tree accumulation
-;; special forms
-
-;; 1.1.4 Compound Procedures
-
-;; procedure definitions
+;; ### 1.1.4 Compound Procedures
 
 (define (square x) (* x x))
-
-;; compound procedure
 
 (square 21)
 ;; 441
@@ -129,7 +85,7 @@ circumference
 (f 5)
 ;; 136
 
-;; 1.1.5 The Substitution Model for Procedure Application
+;; ### 1.1.5 The Substitution Model for Procedure Application
 
 ;; (f 5)
 ;; (sum-of-squares (+ a 1 (* a 2)))
@@ -139,9 +95,7 @@ circumference
 ;; (+ 36 100)
 ;; 136
 
-;; substitution model
-
-;; Applicative order versus normal order
+;; #### Applicative order versus normal order
 
 ;; (f 5)
 ;; (sum-of-squares (+ 5 1) (* 5 2))
@@ -151,27 +105,12 @@ circumference
 ;; (+ 36 100)
 ;; 136
 
-;; normal-order evaluation
-;; applicative-order evaluation
-
-;; 1.1.6 Conditional Expressions and Predicates
-
-;; case analysis
+;; ### 1.1.6 Conditional Expressions and Predicates
 
 (define (abs x)
 	(cond ((> x 0) x)
 				((= x 0) 0)
 				((< x 0) (- x))))
-
-;; (cond (<p_1> <e_1>)
-;;			 (<p_2> <e_2>)
-;;			 ...
-;;			 (<p_n> <e_n>))
-
-;; (<p> <e>)
-;; clauses
-;; predicate
-;; consequent expression
 
 (define (abs x)
 	(cond ((< x 0) (- x))
@@ -182,75 +121,72 @@ circumference
 			(- x)
 			x))
 
-;; (if <predicate> <consequent> <alternative>)
-
-;; (and <e_1> ... <e_n>)
-;; (or <e_1> ... <e_n>)
-;; (not <e>)
-
 ;; (and (> x 5) (< x 10))
 
 (define (>= x y) (or (> x y) (= x y)))
 
 (define (>= x y) (not (< x y)))
 
-;; Exercise 1.1
+;; ##### Exercise 1.1
+;; Below is a sequence of expressions. What is the result printed
+;; by the interpreter in response to each expression? Assume that the sequence
+;; is to be evaluated in the order in which it is presented.
 
-10
-;; 10
-(+ 5 3 4)
-;; 12
-(- 9 1)
-;; 8
-(/ 6 2)
-;; 3
-(+ (* 2 4) (- 4 6))
-;; 6
+10 ;; 10
+(+ 5 3 4) ;; 12
+(- 9 1) ;; 8
+(/ 6 2) ;; 3
+(+ (* 2 4) (- 4 6)) ;; 6
 (define a 3)
 (define b (+ a 1))
-(+ a b (* a b))
-;; 19
-(= a b)
-;; #f
+(+ a b (* a b)) ;; 19
+(= a b) ;; #f
 (if (and (> b a) (< b (* a b)))
 		b
-		a)
-;; 4
+		a) ;; 4
 (cond ((= a 4) 6)
 			((= b 4) (+ 6 7 a))
-			(else 25))
-;; 16
-(+ 2 (if (> b a) b a))
-;; 6
+			(else 25)) ;; 16
+(+ 2 (if (> b a) b a)) ;; 6
 (* (cond ((> a b) a)
 				 ((< a b) b)
 				 (else -1))
-	 (+ a 1))
-;; 16
+	 (+ a 1)) ;; 16
 
-;; Exercise 1.2
-(/ (+ 5 4 (- 2 (- 3 (+ 6
-											 (/ 4 5)))))
-	 (* 3
-			(- 6 2)
-			(- 2 7)))
-;; -37/150
+;; ##### Exercise 1.2
+;; Translate the following expression into prefix form:
 
-;; Exercise 1.3
+;; 5 + 4 + (2 - (3 - (6 + 4/5)))
+;; -----------------------------
+;;				3(6 - 2)(2 - 7)
+
+(/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 4 5)))))
+	 (* 3	(- 6 2)	(- 2 7))) ;; -37/150
+
+;; ##### Exercise 1.3
+;; Define a procedure that takes three numbers as arguments and returns the sum
+;; of the squares of the two larger numbers.
 
 (define (sum-of-squares-3 a b c)
 	(cond ((= (min a b c) a) (sum-of-squares b c))
 				((= (min a b c) b) (sum-of-squares a c))
 				(else (sum-of-squares a b))))
 
-;; Exercise 1.4
+(sum-of-squares-3 5 2 4) ;; 5^2 + 4^ 2 = 41
+
+;; ##### Exercise 1.4
+;; Observe that our model of evaluation allows for combinations whose operators
+;; are compound expressions. Use this observation to describe the behavior of
+;; the following procedure:
 
 (define (a-plus-abs-b a b)
 	((if (> b 0) + -) a b))
 
-;; If b > 0 then add a b, otherwise subtract.
+;; If b > 0 then add a b, otherwise subtract: (if (> b 0) + -) returns either
+;; the plus or minus function (cleverly disguised as + and -).
 
-;; Exercise 1.5
+;; ##### Exercise 1.5
+;;
 
 (define (p) (p))
 (define (test x y)
@@ -1175,8 +1111,155 @@ euler-e-frac
 								 k))
 
 (tan-cf 1 10)
+;; 1.557407724654902
 
+;; ### 1.3.4 Procedures as Returned Values
 
+(define (average-damp f) (lambda (x) (average x (f x))))
+
+((average-damp square) 10)
+;; 55
+
+(define (sqrt x)
+	(fixed-point (average-damp (lambda (y) (/ x y))) 1.0))
+
+(sqrt 2)
+;; 1.4142135623746899
+
+(define (cube-roots x)
+	(fixed-point (average-damp (lambda (y) (/ x (square y)))) 1.0))
+
+(cube-roots 27)
+;; 2.9999972321057697
+
+;; #### Newton's Method
+
+(define (deriv g) (lambda (x) (/ (- (g (+ x dx)) (g x)) dx)))
+
+(define dx 0.00001)
+
+(define (cube x) (* x x x))
+
+((deriv cube) 5)
+;; 75.00014999664018
+
+(define (newton-transform g)
+	(lambda (x) (- x
+						(/ (g x)
+							 ((deriv g) x)))))
+
+(define (newtons-method g guess)
+	(fixed-point (newton-transform g) guess))
+
+(define (sqrt x)
+	(newtons-method (lambda (y) (- (square y) x))
+									1.0))
+
+(sqrt 2)
+;; 1.4142135623822438
+
+;; #### Abstractions and first-class procedures
+
+(define (fixed-point-of-transform g transform guess)
+	(fixed-point (transform g) guess))
+
+(define (sqrt x)
+	(fixed-point-of-transform
+	 (lambda (y) (/ x y)) average-damp 1.0))
+
+(define (sqrt x)
+	(fixed-point-of-transform
+	 (lambda (y) (- (square y) x)) newton-transform 1.0))
+
+;; Exercise 1.40
+
+(define (cubic a b c)
+	(lambda (x) (+ (cube x) (* a (square x)) (* b x) c)))
+
+;; Approximate zeroes of the cubic x^3 + ax^2 + bx + c
+;; (newtons-method (cubic a b c) 1)
+(newtons-method (cubic 3 4 5) 1)
+;; -2.2134116627621956
+
+;; Exercise 1.41
+
+(define (double f)
+	(lambda (x) (f (f x))))
+
+((double inc) 1)
+;; 3
+
+(((double (double double)) inc) 5)
+;; 21
+
+;; Exercise 1.42
+
+(define (compose f g)
+	(lambda (x) (f (g x))))
+
+((compose square inc) 6)
+;; 49
+
+;; Exercise 1.43
+
+(define (repeated f n)
+	(if (= n 0)
+			(lambda (x) x)
+			(compose f (repeated f (- n 1)))))
+
+((repeated square 2) 5)
+;; 625
+
+;; Exercise 1.44
+
+(define (smooth f)
+	(lambda (x) (/ (+ (f (- x dx)) (f x) (f (+ x dx))) 3)))
+
+((smooth cube) 2)
+;; 8.0000000004
+
+(define (smooth-n-fold f n)
+	((repeated smooth n) f))
+
+((smooth-n-fold cube 4) 2)
+;; 8.0000000016
+
+;; Exercise 1.45
+
+(define (cube-roots x)
+	(fixed-point (average-damp (lambda (y) (/ x (square y)))) 1.0))
+
+(define (n-root x n)
+	(let ((n-damp (repeated average-damp (floor (/ n 2)))))
+		(fixed-point (n-damp (lambda (y) (/ x (expt y (- n 1))))) 1.0)))
+
+(n-root 81 3)
+;; 4.326750695102632
+
+(n-root 64 4)
+;; 2.82842712474619
+
+;; Exercise 1.46
+
+(define (iterative-improvement good-enough? improve-guess)
+	(define (lambda-rec guess)
+		(let ((next-guess (improve-guess guess)))
+			(if (good-enough? guess next-guess)
+					guess
+					(lambda-rec next-guess))))
+	lambda-rec)
+
+(define (sqrt x)
+	((iterative-improvement (lambda (guess next) (< (abs (- guess next)) 0.00001))
+													(average-damp (lambda (y) (/ x y)))) 1.0))
+
+(sqrt 8)
+;; 2.8284271250498643
+
+(define (fixed-point f first-guess)
+	((iterative-improvement (lambda (guess next) (< (abs (- guess next)) 0.00001))
+													f)
+	 first-guess))
 
 
 
