@@ -17,13 +17,13 @@
 (* 25 4 12) ;; 1200
 
 (+ (* 3 5) (- 10 6)) ;; 19
-(+ (* 3 (+	(* 2 4) (+ 3 5))) (+ (- 10 7) 6)) ;; 57
+(+ (* 3 (+  (* 2 4) (+ 3 5))) (+ (- 10 7) 6)) ;; 57
 
 (+ (* 3
-			(+ (* 2 4)
-				 (+ 3 5)))
-	 (+ (- 10 7)
-			6)) ;; 57
+      (+ (* 2 4)
+         (+ 3 5)))
+   (+ (- 10 7)
+      6)) ;; 57
 
 ;; ### 1.1.2 Naming and the Environment
 
@@ -41,7 +41,7 @@ circumference ;; 62.8318
 ;; ### 1.1.3 Evaluating Combinations
 
 (* (+ 2 (* 4 6))
-	 (+ 3 5 7)) ;; 390
+   (+ 3 5 7)) ;; 390
 
 ;; ### 1.1.4 Compound Procedures
 
@@ -54,49 +54,49 @@ circumference ;; 62.8318
 ;; `(+ (square x) (square y))`
 
 (define (sum-of-squares x y)
-	(+ (square x) (square y)))
+  (+ (square x) (square y)))
 
 (sum-of-squares 3 4) ;; 25
 
 (define (f a)
-	(sum-of-squares (+ a 1) (* a 2)))
+  (sum-of-squares (+ a 1) (* a 2)))
 (f 5) ;; 136
 
 ;; ### 1.1.5 The Substitution Model for Procedure Application
 
-;;	 (f 5)
-;;	 (sum-of-squares (+ a 1 (* a 2)))
-;;	 (sum-of-squares (+ 5 1 (* 5 2)))
-;;	 (+ (square 6) (square 10))
-;;	 (+ (* 6 6) (* 10 10))
-;;	 (+ 36 100)
-;;	 136
+;;   (f 5)
+;;   (sum-of-squares (+ a 1 (* a 2)))
+;;   (sum-of-squares (+ 5 1 (* 5 2)))
+;;   (+ (square 6) (square 10))
+;;   (+ (* 6 6) (* 10 10))
+;;   (+ 36 100)
+;;   136
 
 ;; #### Applicative order versus normal order
 
-;;	 (f 5)
-;;	 (sum-of-squares (+ 5 1) (* 5 2))
-;;	 (+		(square (+ 5 1))			(square (* 5 2))	)
-;;	 (+		(* (+ 5 1) (+ 5 1))		(* (* 5 2) (* 5 2)))
-;;	 (+ (* 6 6) (* 10 10))
-;;	 (+ 36 100)
-;;	 136
+;;   (f 5)
+;;   (sum-of-squares (+ 5 1) (* 5 2))
+;;   (+   (square (+ 5 1))      (square (* 5 2))  )
+;;   (+   (* (+ 5 1) (+ 5 1))   (* (* 5 2) (* 5 2)))
+;;   (+ (* 6 6) (* 10 10))
+;;   (+ 36 100)
+;;   136
 
 ;; ### 1.1.6 Conditional Expressions and Predicates
 
 (define (abs x)
-	(cond ((> x 0) x)
-				((= x 0) 0)
-				((< x 0) (- x))))
+  (cond ((> x 0) x)
+        ((= x 0) 0)
+        ((< x 0) (- x))))
 
 (define (abs x)
-	(cond ((< x 0) (- x))
-				(else x)))
+  (cond ((< x 0) (- x))
+        (else x)))
 
 (define (abs x)
-	(if (< x 0)
-			(- x)
-			x))
+  (if (< x 0)
+      (- x)
+      x))
 
 ;; `(and (> x 5) (< x 10))`
 
@@ -119,35 +119,35 @@ circumference ;; 62.8318
 (+ a b (* a b)) ;; 19
 (= a b) ;; #f
 (if (and (> b a) (< b (* a b)))
-		b
-		a) ;; 4
+    b
+    a) ;; 4
 (cond ((= a 4) 6)
-			((= b 4) (+ 6 7 a))
-			(else 25)) ;; 16
+      ((= b 4) (+ 6 7 a))
+      (else 25)) ;; 16
 (+ 2 (if (> b a) b a)) ;; 6
 (* (cond ((> a b) a)
-				 ((< a b) b)
-				 (else -1))
-	 (+ a 1)) ;; 16
+         ((< a b) b)
+         (else -1))
+   (+ a 1)) ;; 16
 
 ;; ##### Exercise 1.2
 ;; Translate the following expression into prefix form:
 
-;;	 5 + 4 + (2 - (3 - (6 + 4/5)))
-;;	 -----------------------------
-;;					3(6 - 2)(2 - 7)
+;;   5 + 4 + (2 - (3 - (6 + 4/5)))
+;;   -----------------------------
+;;          3(6 - 2)(2 - 7)
 
 (/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 4 5)))))
-	 (* 3	(- 6 2)	(- 2 7))) ;; -37/150
+   (* 3 (- 6 2) (- 2 7))) ;; -37/150
 
 ;; ##### Exercise 1.3
 ;; Define a procedure that takes three numbers as arguments and returns the sum
 ;; of the squares of the two larger numbers.
 
 (define (sum-of-squares-3 a b c)
-	(cond ((= (min a b c) a) (sum-of-squares b c))
-				((= (min a b c) b) (sum-of-squares a c))
-				(else (sum-of-squares a b))))
+  (cond ((= (min a b c) a) (sum-of-squares b c))
+        ((= (min a b c) b) (sum-of-squares a c))
+        (else (sum-of-squares a b))))
 
 (sum-of-squares-3 5 2 4) ;; 5^2 + 4^ 2 = 41
 
@@ -157,7 +157,7 @@ circumference ;; 62.8318
 ;; the following procedure:
 
 (define (a-plus-abs-b a b)
-	((if (> b 0) + -) a b))
+  ((if (> b 0) + -) a b))
 
 ;; If *b > 0* then add *a* and *b*, otherwise subtract: `(if (> b 0) + -)`
 ;; returns either the `plus` or `minus` function (cleverly disguised as `+` and
@@ -170,7 +170,7 @@ circumference ;; 62.8318
 
 (define (p) (p))
 (define (test x y)
-	(if (= x 0) 0 y))
+  (if (= x 0) 0 y))
 
 ;; Then he evaluates the expression
 ;; `(test 0 (p))`
@@ -186,21 +186,21 @@ circumference ;; 62.8318
 ;; ### 1.1.7 Example: Square Roots by Newton's Method
 
 (define (sqrt-iter guess x)
-	(if (good-enough? guess x)
-			guess
-			(sqrt-iter (improve guess x) x)))
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x) x)))
 
 (define (improve guess x)
-	(average guess (/ x guess)))
+  (average guess (/ x guess)))
 
 (define (average x y)
-	(/ (+ x y) 2))
+  (/ (+ x y) 2))
 
 (define (good-enough? guess x)
-	(< (abs (- (square guess) x)) 0.001))
+  (< (abs (- (square guess) x)) 0.001))
 
 (define (sqrt x)
-	(sqrt-iter 1.0 x))
+  (sqrt-iter 1.0 x))
 
 (sqrt 9) ;; 3.00009155413138
 (sqrt (+ 100 37)) ;; 11.704699917758145
@@ -214,8 +214,8 @@ circumference ;; 62.8318
 ;; done, and she defines a new version of `if`:
 
 (define (new-if predicate then-clause else-clause)
-	(cond (predicate then-clause)
-				(else else-clause)))
+  (cond (predicate then-clause)
+        (else else-clause)))
 
 ;; Eva demonstrates the program for Alyssa:
 (new-if (= 2 3) 0 5) ;; 5
@@ -223,10 +223,10 @@ circumference ;; 62.8318
 
 ;; Delighted, Alyssa uses `new-if` to rewrite the square-root program:
 
-;;	 (define (sqrt-iter guess x)
-;;		(new-if (good-enough? guess x)
-;;						guess
-;;						(sqrt-iter (improve guess x) x)))
+;;   (define (sqrt-iter guess x)
+;;    (new-if (good-enough? guess x)
+;;            guess
+;;            (sqrt-iter (improve guess x) x)))
 
 ;; The program will loop infinitely because the predicate expression will only
 ;; be evaluated once (to false) resulting in a infinite loop since it won't be
@@ -250,26 +250,26 @@ circumference ;; 62.8318
 ;; Newton's method for cube roots is based on the fact that if *y* is an
 ;; approximation to the cube root of *x*, then a better approximation is given
 ;; by the value
-;;		x / y^2 + 2y
-;;		------------
-;;					3
+;;    x / y^2 + 2y
+;;    ------------
+;;          3
 
 (define (cube x)
-	(* x x x))
+  (* x x x))
 
 (define (cube-iter guess x)
-	(if (cube-good-enough? guess x)
-			guess
-			(cube-iter (cube-improve guess x) x)))
+  (if (cube-good-enough? guess x)
+      guess
+      (cube-iter (cube-improve guess x) x)))
 
 (define (cube-improve guess x)
-	(/ (+ (/ x (square guess)) (* 2 guess)) 3))
+  (/ (+ (/ x (square guess)) (* 2 guess)) 3))
 
 (define (cube-good-enough? guess x)
-	(< (abs (- (cube guess) x)) 0.001))
+  (< (abs (- (cube guess) x)) 0.001))
 
 (define (cube-root x)
-	(cube-iter 1.0 x))
+  (cube-iter 1.0 x))
 
 (cube-root 27) ;; 3.0000005410641766
 
@@ -285,72 +285,72 @@ circumference ;; 62.8318
 (define (square y) (* y y))
 
 (define (good-enough? guess x)
-	(< (abs (- (square guess) x))
-		 0.001))
+  (< (abs (- (square guess) x))
+     0.001))
 
 ;; #### Internal definitions and block structure
 
 (define (sqrt x)
-	(sqrt-iter 1.0 x))
+  (sqrt-iter 1.0 x))
 (define (sqrt-iter guess x)
-	(if (good-enough? guess x)
-			guess
-			(sqrt-iter (improve guess x))))
+  (if (good-enough? guess x)
+      guess
+      (sqrt-iter (improve guess x))))
 (define (good-enough? guess x)
-	(< (abs (- (square guess) x)) 0.001))
+  (< (abs (- (square guess) x)) 0.001))
 (define (improve guess x)
-	(average guess (/ x guess)))
+  (average guess (/ x guess)))
 
 (define (sqrt x)
-	(define (good-enough? guess x)
-		(< (abs (- (square guess) x)) 0.001))
-	(define (improve guess x)
-		(average guess (/ x guess)))
-	(define (sqrt-iter guess x)
-		(if (good-enough? guess x)
-				guess
-				(sqrt-iter (improve guess x) x)))
-	(sqrt-iter 1.0 x))
+  (define (good-enough? guess x)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess x)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess x)
+    (if (good-enough? guess x)
+        guess
+        (sqrt-iter (improve guess x) x)))
+  (sqrt-iter 1.0 x))
 
 (define (sqrt x)
-	(define (good-enough? guess)
-		(< (abs (- (square guess) x)) 0.001))
-	(define (improve guess)
-		(average guess (/ x guess)))
-	(define (sqrt-iter guess)
-		(if (good-enough? guess)
-				guess
-				(sqrt-iter (improve guess))))
-	(sqrt-iter 1.0))
+  (define (good-enough? guess)
+    (< (abs (- (square guess) x)) 0.001))
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (sqrt-iter guess)
+    (if (good-enough? guess)
+        guess
+        (sqrt-iter (improve guess))))
+  (sqrt-iter 1.0))
 
 ;; ## 1.2 Procedures and the Processes They Generate
 
 ;; ### 1.2.1 Linear Recursion and Iteration
 
 (define (factorial n)
-	(if (= n 1)
-			1
-			(* n (factorial (- n 1)))))
+  (if (= n 1)
+      1
+      (* n (factorial (- n 1)))))
 
 (define (factorial n)
-	(fact-iter 1 1 n))
+  (fact-iter 1 1 n))
 (define (fact-iter product counter max-count)
-	(if (> counter max-count)
-			product
-			(fact-iter (* counter product)
-								 (+ counter 1)
-								 max-count)))
+  (if (> counter max-count)
+      product
+      (fact-iter (* counter product)
+                 (+ counter 1)
+                 max-count)))
 
 ;; ##### Exercise 1.9
 ;; Each of the following two procedures defines a method for adding two positive
 ;; integers in terms of the procedures `inc`, which increments its arguments by
 ;; 1, and `dec`, which decrements its argument by 1.
 
-;;		(define (+ a b)
-;;			(if (= a 0) b (inc (+ (dec a) b))))
+;;    (define (+ a b)
+;;      (if (= a 0) b (inc (+ (dec a) b))))
 
-;;		(define (+ a b)
-;;			(if (= a 0) b (+ (dec a) (inc b))))
+;;    (define (+ a b)
+;;      (if (= a 0) b (+ (dec a) (inc b))))
 
 ;; Using the substitution model, illustrate the process generated by each
 ;; procedure in evaluating `(+ 4 5)`. Are these processes iterative or
@@ -363,10 +363,10 @@ circumference ;; 62.8318
 ;; function.
 
 (define (A x y)
-	(cond ((= y 0) 0)
-				((= x 0) (* 2 y))
-				((= y 1) 2)
-				(else (A (- x 1) (A x (- y 1))))))
+  (cond ((= y 0) 0)
+        ((= x 0) (* 2 y))
+        ((= y 1) 2)
+        (else (A (- x 1) (A x (- y 1))))))
 
 ;; What are the values of the following expressions?
 
@@ -376,9 +376,9 @@ circumference ;; 62.8318
 
 ;; Consider the following procedures, where `A` is the procedure defined above:
 
-(define (f n) (A 0 n))	 ;; f compute 2*n
-(define (g n) (A 1 n))	 ;; g computes 2^n
-(define (h n) (A 2 n))	 ;; h computes 2^2^n
+(define (f n) (A 0 n))   ;; f compute 2*n
+(define (g n) (A 1 n))   ;; g computes 2^n
+(define (h n) (A 2 n))   ;; h computes 2^2^n
 (define (k n) (* 5 n n)) ;; k computes 5n^2
 
 ;; Give concise mathematical definitions for the functions computed by the
@@ -388,39 +388,39 @@ circumference ;; 62.8318
 ;; ### 1.2.2 Tree Recursion
 
 (define (fib n)
-	(cond ((= n 0) 0)
-				((= n 1) 1)
-				(else (+ (fib (- n 1))
-								 (fib (- n 2))))))
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
 
 (define (fib n)
-	(fib-iter 1 0 n))
+  (fib-iter 1 0 n))
 (define (fib-iter a b count)
-	(if (= count 0)
-			b
-			(fib-iter (+ a b) a (- count 1))))
+  (if (= count 0)
+      b
+      (fib-iter (+ a b) a (- count 1))))
 
 ;; #### Example: Counting change
 
 (define (count-change amount)
-	(cc amount 5))
+  (cc amount 5))
 
 (define (cc amount kinds-of-coins)
-	(cond ((= amount 0) 1)
-				 ((or (< amount 0) (= kinds-of-coins 0)) 0)
-				 (else (+ (cc amount
-											(- kinds-of-coins 1))
-									(cc (- amount
-												 (first-demonination
-													kinds-of-coins))
-											kinds-of-coins)))))
+  (cond ((= amount 0) 1)
+         ((or (< amount 0) (= kinds-of-coins 0)) 0)
+         (else (+ (cc amount
+                      (- kinds-of-coins 1))
+                  (cc (- amount
+                         (first-demonination
+                          kinds-of-coins))
+                      kinds-of-coins)))))
 
 (define (first-demonination kinds-of-coins)
-	(cond ((= kinds-of-coins 1) 1)
-				((= kinds-of-coins 2) 5)
-				((= kinds-of-coins 3) 10)
-				((= kinds-of-coins 4) 25)
-				((= kinds-of-coins 5) 50)))
+  (cond ((= kinds-of-coins 1) 1)
+        ((= kinds-of-coins 2) 5)
+        ((= kinds-of-coins 3) 10)
+        ((= kinds-of-coins 4) 25)
+        ((= kinds-of-coins 5) 50)))
 
 (count-change 100) ;; 292
 
@@ -431,31 +431,31 @@ circumference ;; 62.8318
 ;; *f* by means of an iterative process.
 
 (define (f-rec n)
-	(cond ((< n 3) n)
-				(else (+ (f-rec (- n 1))
-								 (* 2 (f-rec (- n 2)))
-								 (* 3 (f-rec (- n 3)))))))
+  (cond ((< n 3) n)
+        (else (+ (f-rec (- n 1))
+                 (* 2 (f-rec (- n 2)))
+                 (* 3 (f-rec (- n 3)))))))
 ;; *==> 0, 1, 2, 4, 11, 25, 59, 142, 335, 796, 1892*
 
 ;; TODO f-iter
 
 ;; ##### Exercise 1.12
 ;; The following pattern of numbers is called *Pascal's triangle*.
-;;			 1
-;;			1 1
-;;		 1 2 1
-;;		1 3 3 1
-;;	 1 4 6 4 1
+;;       1
+;;      1 1
+;;     1 2 1
+;;    1 3 3 1
+;;   1 4 6 4 1
 ;; The numbers at the edge of the triangle are all 1, and each number inside the
 ;; triangle is the sum of the two numbers above it. Write a procedure that
 ;; computes elements of Pascal's triangle by means of a recursive process.
 
 (define (binomial n k)
-	(cond ((= k 0) 1)
-				((= n 0) 0)
-				(else
-				 (+ (binomial (- n 1) (- k 1))
-						(binomial (- n 1) k)))))
+  (cond ((= k 0) 1)
+        ((= n 0) 0)
+        (else
+         (+ (binomial (- n 1) (- k 1))
+            (binomial (- n 1) k)))))
 
 (binomial 4 2) ;; 6
 
@@ -487,15 +487,15 @@ circumference ;; 62.8318
 ;; than 0.1 radians). These ideas are incorporated in the following procedures:
 
 (define (cube x)
-	(* x x x))
+  (* x x x))
 
 (define (p x)
-	(- (* 3 x) (* 4 (cube x))))
+  (- (* 3 x) (* 4 (cube x))))
 
 (define (sine angle)
-	(if (not (> (abs angle) 0.1))
-			angle
-			(p (sine (/ angle 3.0)))))
+  (if (not (> (abs angle) 0.1))
+      angle
+      (p (sine (/ angle 3.0)))))
 
 ;; **a.** How many times is the procedure `p` applied when (`sine 12.15`) is
 ;; evaluated?
@@ -512,46 +512,46 @@ circumference ;; 62.8318
 ;; b^0 = 1
 
 (define (expt b n)
-	(if (= n 0)
-			1
-			(* b (expt b (- n 1)))))
+  (if (= n 0)
+      1
+      (* b (expt b (- n 1)))))
 
 (expt 2 5)
 ;; 32
 
 (define (expt b n)
-	(expt-iter b n 1))
+  (expt-iter b n 1))
 (define (expt-iter b counter product)
-	(if (= counter 0)
-			product
-			(expt-iter b
-								 (- counter 1)
-								 (* b product))))
+  (if (= counter 0)
+      product
+      (expt-iter b
+                 (- counter 1)
+                 (* b product))))
 
 (expt 2 5)
 ;; 32
 
 (define (fast-expt b n)
-	(cond ((= n 0) 1)
-				((even? n) (square (fast-expt b (/ n 2))))
-				(else (* b (fast-expt b (- n 1))))))
+  (cond ((= n 0) 1)
+        ((even? n) (square (fast-expt b (/ n 2))))
+        (else (* b (fast-expt b (- n 1))))))
 
 (fast-expt 2 5)
 ;; 32
 
 ;; (define (even? n)
-;;	(= (remainder n 2) 0))
+;;  (= (remainder n 2) 0))
 
 ;; Exercise 1.16
 
 ;; invariant quantity
 
 (define (fast-expt-aux b n)
-	(define (iter a b n)
-		(cond ((= n 0) a)
-					((even? n) (iter a (square b) (/ n 2)))
-					(else (iter (* a b) b (- n 1)))))
-	(iter 1 b n))
+  (define (iter a b n)
+    (cond ((= n 0) a)
+          ((even? n) (iter a (square b) (/ n 2)))
+          (else (iter (* a b) b (- n 1)))))
+  (iter 1 b n))
 
 (fast-expt 2 5) ;; 32
 (fast-expt-aux 2 5) ;; 32
@@ -559,41 +559,41 @@ circumference ;; 62.8318
 ;; Exercise 1.17
 
 (define (mult a b)
-	(if (= b 0)
-			0
-			(+ a (mult a (- b 1)))))
+  (if (= b 0)
+      0
+      (+ a (mult a (- b 1)))))
 
 (define (double n)
-	(if (= n 0)
-			0
-			(+ 2 (double (- n 1)))))
+  (if (= n 0)
+      0
+      (+ 2 (double (- n 1)))))
 
 (double 17) ;; 34
 
 (define (halve n)
-	(define (iter a n)
-		(cond ((= n 0) a)
-					((= n 1) a)
-					(else (iter (+ 1 a) (- n 2)))))
-	(iter 0 n))
+  (define (iter a n)
+    (cond ((= n 0) a)
+          ((= n 1) a)
+          (else (iter (+ 1 a) (- n 2)))))
+  (iter 0 n))
 
 (halve 34) ; 17
 
 (define (fast-mult b n)
-	(cond ((= n 0) 0)
-				((even? n) (double (fast-mult b (halve n))))
-				(else (+ b (fast-mult b (- n 1))))))
+  (cond ((= n 0) 0)
+        ((even? n) (double (fast-mult b (halve n))))
+        (else (+ b (fast-mult b (- n 1))))))
 
 (fast-mult 7 8) ; 56
 
 ;; Exercise 1.18
 
 (define (russian-peasant b n)
-	(define (iter a b n)
-		(cond ((= n 0) a)
-					((even? n) (iter a (double b) (/ n 2)))
-					(else (iter (+ a b) b (- n 1)))))
-	(iter 0 b n))
+  (define (iter a b n)
+    (cond ((= n 0) a)
+          ((even? n) (iter a (double b) (/ n 2)))
+          (else (iter (+ a b) b (- n 1)))))
+  (iter 0 b n))
 
 (russian-peasant 4 7) ; 28
 
@@ -602,30 +602,30 @@ circumference ;; 62.8318
 ;; a' <- bq + aq + ap = (p + q)a + bq
 ;; b' <- bp + aq
 ;; a'' <- b'q + a'q + a'p = (bp + aq)q + ((p+q)a + bq)q + ((p+q)a + bq)p
-;;												= bpq + aq^2 + apq aq^2 + bq^2 + ap^2 + apq + bpq
-;;												= (2q^2 + 2pq + p^2)a + (2pq + q^2)b
+;;                        = bpq + aq^2 + apq aq^2 + bq^2 + ap^2 + apq + bpq
+;;                        = (2q^2 + 2pq + p^2)a + (2pq + q^2)b
 ;; b'' <- b'p + a'q = (bp + aq)p + ((p+q)a + bq)q
-;;									= bp^2 + apq + apq + aq^2 + bq^2
-;;									= (2pq + q^2)a (p^2 + q^2)b
+;;                  = bp^2 + apq + apq + aq^2 + bq^2
+;;                  = (2pq + q^2)a (p^2 + q^2)b
 
 (define (square x) (* x x))
 
 (define (fib n)
-	(fib-iter 1 0 0 1 n))
+  (fib-iter 1 0 0 1 n))
 
 (define (fib-iter a b p q count)
-	(cond ((= count 0) b)
-				((even? count)
-				 (fib-iter a
-									 b
-									 (+ (square p) (square q))
-									 (+ (* 2 p q) (square q))
-									 (/ count 2)))
-				(else (fib-iter (+ (* b q) (* a q) (* a p))
-												(+ (* b p) (* a q))
-												p
-												q
-												(- count 1)))))
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (+ (square p) (square q))
+                   (+ (* 2 p q) (square q))
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
 
 (fib 0)
 (fib 1)
@@ -640,17 +640,17 @@ circumference ;; 62.8318
 ;; GCD(a,b) = GCD(b,r)
 
 ;; GCD(206,40) = GCD(40,6)
-;;						 = GCD(6,4)
-;;						 = GCD(4,2)
-;;						 = GCD(2,0)
-;;						 = 2
+;;             = GCD(6,4)
+;;             = GCD(4,2)
+;;             = GCD(2,0)
+;;             = 2
 
 ;; Euclid's Algorithm
 
 (define (gcd a b)
-	(if (= b 0)
-			a
-			(gcd b (remainder a b))))
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
 
 ;; Lame's Theorem: If Euclid's Algorithm requires $k$ steps to compute the GCD
 ;; of some pair, then the smaller number in the pair must be greater than or
@@ -665,14 +665,14 @@ circumference ;; 62.8318
 ;; Searching for divisors
 
 (define (smallest-divisor n)
-	(find-divisor n 2))
+  (find-divisor n 2))
 (define (find-divisor n test-divisor)
-	(cond ((> (square test-divisor) n) n)
-				((divides? test-divisor n) test-divisor)
-				(else (find-divisor n (+ test-divisor 1)))))
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))))
 (define (divides? a b) (= (remainder b a) 0))
 (define (prime? n)
-	(= n (smallest-divisor n)))
+  (= n (smallest-divisor n)))
 
 (prime? 8)
 (prime? 13)
@@ -684,34 +684,34 @@ circumference ;; 62.8318
 ;; $a$ modulo $n$.
 
 (define (expmod base exp m)
-	(cond ((= exp 0)
-				 1)
-				((even? exp)
-				 (remainder
-					(square
-					 (expmod base (/ exp 2) m))
-					m))
-				(else
-				 (remainder
-					(* base
-						 (expmod base (- exp 1) m))
-					m))))
+  (cond ((= exp 0)
+         1)
+        ((even? exp)
+         (remainder
+          (square
+           (expmod base (/ exp 2) m))
+          m))
+        (else
+         (remainder
+          (* base
+             (expmod base (- exp 1) m))
+          m))))
 
 (expmod 4 5 5)
 
 ;; our poorly implemented random function
 (define (random n)
-	(/ n 2))
+  (/ n 2))
 
 (define (fermat-test n)
-	(define (try-it a)
-		(= (expmod a n n) a))
-	(try-it (+ 1 (random (- n 1)))))
+  (define (try-it a)
+    (= (expmod a n n) a))
+  (try-it (+ 1 (random (- n 1)))))
 
 (define (fast-prime? n times)
-	(cond ((= times 0) #t)
-				((fermat-test n) (fast-prime? n (- times 1)))
-				(else #f)))
+  (cond ((= times 0) #t)
+        ((fermat-test n) (fast-prime? n (- times 1)))
+        (else #f)))
 
 (fast-prime? 13 1)
 
@@ -764,41 +764,41 @@ circumference ;; 62.8318
 ;; 1.3.1 Procedures as Arguments
 
 (define (sum-integers a b)
-	(if (> a b)
-			0
-			(+ a
-				 (sum-integers (+ a 1) b))))
+  (if (> a b)
+      0
+      (+ a
+         (sum-integers (+ a 1) b))))
 
 (define (sum-cubes a b)
-	(if (> a b)
-			0
-			(+ (cube a)
-				 (sum-cubes (+ a 1) b))))
+  (if (> a b)
+      0
+      (+ (cube a)
+         (sum-cubes (+ a 1) b))))
 
 (define (pi-sum a b)
-	(if (> a b)
-			0
-			(+ (/ 1.0 (* a (+ a 2)))
-				 (pi-sum (+ a 4) b))))
+  (if (> a b)
+      0
+      (+ (/ 1.0 (* a (+ a 2)))
+         (pi-sum (+ a 4) b))))
 
 ;; (define (<name> a b)
-;;		(if (> a b)
-;;				0
-;;				(+ (<term> a)
-;;					 (<name> (<next> a) b))))
+;;    (if (> a b)
+;;        0
+;;        (+ (<term> a)
+;;           (<name> (<next> a) b))))
 
 ;; *summation of a series*
 
 (define (sum term a next b)
-	(if (> a b)
-			0
-			(+ (term a)
-				 (sum term (next a) next b))))
+  (if (> a b)
+      0
+      (+ (term a)
+         (sum term (next a) next b))))
 
 (define (inc n) (+ n 1))
 
 (define (sum-cubes a b)
-	(sum cube a inc b))
+  (sum cube a inc b))
 
 (sum-cubes 1 10)
 ;; 3025
@@ -806,26 +806,26 @@ circumference ;; 62.8318
 (define (identity x) x)
 
 (define (sum-integers a b)
-	(sum identity a inc b))
+  (sum identity a inc b))
 
 (sum-integers 1 10)
 ;; 55
 
 (define (pi-sum a b)
-	(define (pi-term x)
-		(/ 1.0 (* x (+ x 2))))
-	(define (pi-next x)
-		(+ x 4))
-	(sum pi-term a pi-next b))
+  (define (pi-term x)
+    (/ 1.0 (* x (+ x 2))))
+  (define (pi-next x)
+    (+ x 4))
+  (sum pi-term a pi-next b))
 
 (* 8 (pi-sum 1 1000))
 ;; 3.139592655589783
 
 (define (integral f a b dx)
-	(define (add-dx x)
-		(+ x dx))
-	(* (sum f (+ a (/ dx 2.0)) add-dx b)
-		 dx))
+  (define (add-dx x)
+    (+ x dx))
+  (* (sum f (+ a (/ dx 2.0)) add-dx b)
+     dx))
 
 (integral cube 0 1 0.01)
 ;; 0.24998750000000042
@@ -860,17 +860,17 @@ circumference ;; 62.8318
 (lambda (x) (/ 1.0 (* x (+ x 2))))
 
 (define (pi-sum a b)
-	(sum (lambda (x) (/ 1.0 (* x (+ x 2))))
-			 a
-			 (lambda (x) (+ x 4))
-			 b))
+  (sum (lambda (x) (/ 1.0 (* x (+ x 2))))
+       a
+       (lambda (x) (+ x 4))
+       b))
 
 (define (integral f a b dx)
-	(* (sum f
-					(+ a (/ dx 2.0))
-					(lambda (x) (+ x dx))
-					b)
-		 dx))
+  (* (sum f
+          (+ a (/ dx 2.0))
+          (lambda (x) (+ x dx))
+          b)
+     dx))
 
 ;; (lambda (<formal-parameters>) <body>)
 
@@ -884,40 +884,40 @@ circumference ;; 62.8318
 ;; #### Using let to create local variables
 
 (define (f x y)
-	(define (f-helper a b)
-		(+ (* x (square a))
-			 (* y b)
-			 (* a b)))
-	(f-helper (+ 1 (* x y))
-						(- 1 y)))
+  (define (f-helper a b)
+    (+ (* x (square a))
+       (* y b)
+       (* a b)))
+  (f-helper (+ 1 (* x y))
+            (- 1 y)))
 
 (define (f x y)
-	((lambda (a b)
-		 (+ (* x (square a))
-				(* y b)
-				(* a b)))
-	 (+ 1 (* x y))
-	 (- 1 y)))
+  ((lambda (a b)
+     (+ (* x (square a))
+        (* y b)
+        (* a b)))
+   (+ 1 (* x y))
+   (- 1 y)))
 
 (define (f x y)
-	(let ((a (+ 1 (* x y)))
-				(b (- 1 y)))
-		(+ (* x (square a))
-			 (* y b)
-			 (* a b))))
+  (let ((a (+ 1 (* x y)))
+        (b (- 1 y)))
+    (+ (* x (square a))
+       (* y b)
+       (* a b))))
 
 ;; (let ((<var_1> <exp_1>)
-;;			 (<var_2> <exp_2>)
-;;			 ...
-;;			 (<var_n> <exp_n>))
-;;		<body>)
+;;       (<var_2> <exp_2>)
+;;       ...
+;;       (<var_n> <exp_n>))
+;;    <body>)
 
 (define (f x y)
-	(define a (+ 1 (* x y)))
-	(define b (- 1 y))
-	(+ (* x (square a))
-		 (* y b)
-		 (* a b)))
+  (define a (+ 1 (* x y)))
+  (define b (- 1 y))
+  (+ (* x (square a))
+     (* y b)
+     (* a b)))
 
 ;; Exercise 1.34
 
@@ -932,33 +932,33 @@ circumference ;; 62.8318
 ;; *half-interval method*.
 
 (define (search f neg-point pos-point)
-	(let ((midpoint (average neg-point pos-point)))
-		(if (close-enough? neg-point pos-point)
-				midpoint
-				(let ((test-value (f midpoint)))
-					(cond ((positive? test-value)
-								 (search f neg-point midpoint))
-								((negative? test-value)
-								 (search f midpoint pos-point))
-								(else midpoint))))))
+  (let ((midpoint (average neg-point pos-point)))
+    (if (close-enough? neg-point pos-point)
+        midpoint
+        (let ((test-value (f midpoint)))
+          (cond ((positive? test-value)
+                 (search f neg-point midpoint))
+                ((negative? test-value)
+                 (search f midpoint pos-point))
+                (else midpoint))))))
 
 (define (close-enough? x y) (< (abs (- x y)) 0.001))
 
 (define (half-interval-method f a b)
-	(let ((a-value (f a))
-				(b-value (f b)))
-		(cond ((and (negative? a-value) (positive? b-value))
-					 (search f a b))
-					((and (negative? b-value) (positive? a-value))
-					 (search f b a))
-					(else (error "Values are not of opposite sign" a b)))))
+  (let ((a-value (f a))
+        (b-value (f b)))
+    (cond ((and (negative? a-value) (positive? b-value))
+           (search f a b))
+          ((and (negative? b-value) (positive? a-value))
+           (search f b a))
+          (else (error "Values are not of opposite sign" a b)))))
 
 (half-interval-method sin 2.0 4.0)
 ;; 3.14111328125
 
 (half-interval-method (lambda (x) (- (* x x x) (+ (* 2 x) 3)))
-											1.0
-											2.0)
+                      1.0
+                      2.0)
 ;; 1.89306640625
 
 ;; #### Finding fixed points of functions
@@ -968,15 +968,15 @@ circumference ;; 62.8318
 (define tolerance 0.00001)
 
 (define (fixed-point f first-guess)
-	(define (close-enough? v1 v2)
-		(< (abs (- v1 v2))
-			 tolerance))
-	(define (try guess)
-		(let ((next (f guess)))
-			(if (close-enough? guess next)
-					next
-					(try next))))
-	(try first-guess))
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2))
+       tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
 
 (fixed-point cos 1.0)
 ;; 0.7390822985224023
@@ -985,10 +985,10 @@ circumference ;; 62.8318
 ;; 1.2587315962971173
 
 (define (sqrt x) ; buggy
-	(fixed-point (lambda (y) (/ x y)) 1.0))
+  (fixed-point (lambda (y) (/ x y)) 1.0))
 
 (define (sqrt x)
-	(fixed-point (lambda (y) (average y (/ x y)) 1.0)))
+  (fixed-point (lambda (y) (average y (/ x y)) 1.0)))
 
 ;; *average damping*
 
@@ -1000,13 +1000,13 @@ circumference ;; 62.8318
 ;; phi = 1 + 1 / phi
 ;; phi ^ 2 = phi + 1
 ;; phi ^ 2 - phi - 1 = 0
-;;		 1 + sqrt 5												 1 - sqrt 5
+;;     1 + sqrt 5                         1 - sqrt 5
 ;; phi = ------- = 1.61803399887 and phi = ------- = -0.6180339897
-;;				2																2
+;;        2                               2
 
-;;		 1 + sqrt 5
+;;     1 + sqrt 5
 ;; phi = ------- = 1.61803399887...
-;;				2
+;;        2
 
 ;; Use this fact to compute phi by means of the `fixed-point` procedure.
 
@@ -1021,17 +1021,17 @@ circumference ;; 62.8318
 ;; generates, using the `newline` and `display` primitives.
 
 (define (fixed-point f first-guess)
-	(define (close-enough? v1 v2)
-		(< (abs (- v1 v2))
-			 tolerance))
-	(define (try guess)
-		(display guess)
-		(newline)
-		(let ((next (f guess)))
-			(if (close-enough? guess next)
-					next
-					(try next))))
-	(try first-guess))
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2))
+       tolerance))
+  (define (try guess)
+    (display guess)
+    (newline)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
 
 ((lambda () (fixed-point (lambda (y) (+ 1 (/ 1 y))) 1.0))) ; phi again
 
@@ -1050,17 +1050,17 @@ x-power-x
 ;; (/ N_1 (+ D_1 (/ N_2 (+ D_2 (...)))))
 
 (define (cont-frac-rec n d k)
-	(define (cont-rec i)
-		(if (= i k)
-				0
-				(/ (n i) (+ (d i) (cont-rec (+ i 1))))))
-	(cont-rec 0))
+  (define (cont-rec i)
+    (if (= i k)
+        0
+        (/ (n i) (+ (d i) (cont-rec (+ i 1))))))
+  (cont-rec 0))
 
 ;; golden ratio: 0.61803398875
 
 (cont-frac-rec (lambda (i) 1.0)
-							 (lambda (i) 1.0)
-							 11)
+               (lambda (i) 1.0)
+               11)
 ;; 0.6180555555555556
 
 ;; Accuracy of 4 decimals: k = 11.
@@ -1068,32 +1068,32 @@ x-power-x
 ;; b.
 
 (define (cont-frac-iter n d k)
-	(define (cont-iter i a)
-		(if (= 0 i)
-				a
-				(cont-iter (- i 1) (/ (n i) (+ (d i) a)))))
-		(cont-iter k 0))
+  (define (cont-iter i a)
+    (if (= 0 i)
+        a
+        (cont-iter (- i 1) (/ (n i) (+ (d i) a)))))
+    (cont-iter k 0))
 
 (cont-frac-iter (lambda (i) 1.0)
-								(lambda (i) 1.0)
-								11)
+                (lambda (i) 1.0)
+                11)
 ;; 0.6180555555555556
 
 ;; Exercise 1.38
 
 (define (nat-log-series i)
-	(cond ((= i 0) 1)
-				((= i 1) 2)
-				(else (if (not (= (remainder (- i 1) 3) 0))
-									1
-									(+ (* (/ 2 3)
-												(- i 2))
-										 (/ 8 3))))))
+  (cond ((= i 0) 1)
+        ((= i 1) 2)
+        (else (if (not (= (remainder (- i 1) 3) 0))
+                  1
+                  (+ (* (/ 2 3)
+                        (- i 2))
+                     (/ 8 3))))))
 
 (define euler-e-frac
-	(+ 2 (cont-frac-rec (lambda (i) 1.0)
-											nat-log-series
-											10)))
+  (+ 2 (cont-frac-rec (lambda (i) 1.0)
+                      nat-log-series
+                      10)))
 
 euler-e-frac
 ;; 2.7182817182817183
@@ -1103,11 +1103,11 @@ euler-e-frac
 ;; tan x = (/ x (- 1 (/ (square x) (- 3 (square x) (/ -5 ...)))))
 
 (define (tan-cf x k)
-	(cont-frac-rec (lambda (i) (if (= i 0)
-														(+ x 0.0)
-														(- (square (+ x 0.0)))))
-								 (lambda (i) (+ 1.0 (* 2 i)))
-								 k))
+  (cont-frac-rec (lambda (i) (if (= i 0)
+                            (+ x 0.0)
+                            (- (square (+ x 0.0)))))
+                 (lambda (i) (+ 1.0 (* 2 i)))
+                 k))
 
 (tan-cf 1 10)
 ;; 1.557407724654902
@@ -1120,13 +1120,13 @@ euler-e-frac
 ;; 55
 
 (define (sqrt x)
-	(fixed-point (average-damp (lambda (y) (/ x y))) 1.0))
+  (fixed-point (average-damp (lambda (y) (/ x y))) 1.0))
 
 (sqrt 2)
 ;; 1.4142135623746899
 
 (define (cube-roots x)
-	(fixed-point (average-damp (lambda (y) (/ x (square y)))) 1.0))
+  (fixed-point (average-damp (lambda (y) (/ x (square y)))) 1.0))
 
 (cube-roots 27)
 ;; 2.9999972321057697
@@ -1143,16 +1143,16 @@ euler-e-frac
 ;; 75.00014999664018
 
 (define (newton-transform g)
-	(lambda (x) (- x
-						(/ (g x)
-							 ((deriv g) x)))))
+  (lambda (x) (- x
+            (/ (g x)
+               ((deriv g) x)))))
 
 (define (newtons-method g guess)
-	(fixed-point (newton-transform g) guess))
+  (fixed-point (newton-transform g) guess))
 
 (define (sqrt x)
-	(newtons-method (lambda (y) (- (square y) x))
-									1.0))
+  (newtons-method (lambda (y) (- (square y) x))
+                  1.0))
 
 (sqrt 2)
 ;; 1.4142135623822438
@@ -1160,20 +1160,20 @@ euler-e-frac
 ;; #### Abstractions and first-class procedures
 
 (define (fixed-point-of-transform g transform guess)
-	(fixed-point (transform g) guess))
+  (fixed-point (transform g) guess))
 
 (define (sqrt x)
-	(fixed-point-of-transform
-	 (lambda (y) (/ x y)) average-damp 1.0))
+  (fixed-point-of-transform
+   (lambda (y) (/ x y)) average-damp 1.0))
 
 (define (sqrt x)
-	(fixed-point-of-transform
-	 (lambda (y) (- (square y) x)) newton-transform 1.0))
+  (fixed-point-of-transform
+   (lambda (y) (- (square y) x)) newton-transform 1.0))
 
 ;; Exercise 1.40
 
 (define (cubic a b c)
-	(lambda (x) (+ (cube x) (* a (square x)) (* b x) c)))
+  (lambda (x) (+ (cube x) (* a (square x)) (* b x) c)))
 
 ;; Approximate zeroes of the cubic x^3 + ax^2 + bx + c
 ;; (newtons-method (cubic a b c) 1)
@@ -1183,7 +1183,7 @@ euler-e-frac
 ;; Exercise 1.41
 
 (define (double f)
-	(lambda (x) (f (f x))))
+  (lambda (x) (f (f x))))
 
 ((double inc) 1)
 ;; 3
@@ -1194,7 +1194,7 @@ euler-e-frac
 ;; Exercise 1.42
 
 (define (compose f g)
-	(lambda (x) (f (g x))))
+  (lambda (x) (f (g x))))
 
 ((compose square inc) 6)
 ;; 49
@@ -1202,9 +1202,9 @@ euler-e-frac
 ;; Exercise 1.43
 
 (define (repeated f n)
-	(if (= n 0)
-			(lambda (x) x)
-			(compose f (repeated f (- n 1)))))
+  (if (= n 0)
+      (lambda (x) x)
+      (compose f (repeated f (- n 1)))))
 
 ((repeated square 2) 5)
 ;; 625
@@ -1212,13 +1212,13 @@ euler-e-frac
 ;; Exercise 1.44
 
 (define (smooth f)
-	(lambda (x) (/ (+ (f (- x dx)) (f x) (f (+ x dx))) 3)))
+  (lambda (x) (/ (+ (f (- x dx)) (f x) (f (+ x dx))) 3)))
 
 ((smooth cube) 2)
 ;; 8.0000000004
 
 (define (smooth-n-fold f n)
-	((repeated smooth n) f))
+  ((repeated smooth n) f))
 
 ((smooth-n-fold cube 4) 2)
 ;; 8.0000000016
@@ -1226,11 +1226,11 @@ euler-e-frac
 ;; Exercise 1.45
 
 (define (cube-roots x)
-	(fixed-point (average-damp (lambda (y) (/ x (square y)))) 1.0))
+  (fixed-point (average-damp (lambda (y) (/ x (square y)))) 1.0))
 
 (define (n-root x n)
-	(let ((n-damp (repeated average-damp (floor (/ n 2)))))
-		(fixed-point (n-damp (lambda (y) (/ x (expt y (- n 1))))) 1.0)))
+  (let ((n-damp (repeated average-damp (floor (/ n 2)))))
+    (fixed-point (n-damp (lambda (y) (/ x (expt y (- n 1))))) 1.0)))
 
 (n-root 81 3)
 ;; 4.326750695102632
@@ -1241,24 +1241,24 @@ euler-e-frac
 ;; Exercise 1.46
 
 (define (iterative-improvement good-enough? improve-guess)
-	(define (lambda-rec guess)
-		(let ((next-guess (improve-guess guess)))
-			(if (good-enough? guess next-guess)
-					guess
-					(lambda-rec next-guess))))
-	lambda-rec)
+  (define (lambda-rec guess)
+    (let ((next-guess (improve-guess guess)))
+      (if (good-enough? guess next-guess)
+          guess
+          (lambda-rec next-guess))))
+  lambda-rec)
 
 (define (sqrt x)
-	((iterative-improvement (lambda (guess next) (< (abs (- guess next)) 0.00001))
-													(average-damp (lambda (y) (/ x y)))) 1.0))
+  ((iterative-improvement (lambda (guess next) (< (abs (- guess next)) 0.00001))
+                          (average-damp (lambda (y) (/ x y)))) 1.0))
 
 (sqrt 8)
 ;; 2.8284271250498643
 
 (define (fixed-point f first-guess)
-	((iterative-improvement (lambda (guess next) (< (abs (- guess next)) 0.00001))
-													f)
-	 first-guess))
+  ((iterative-improvement (lambda (guess next) (< (abs (- guess next)) 0.00001))
+                          f)
+   first-guess))
 
 
 
