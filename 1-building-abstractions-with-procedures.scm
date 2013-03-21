@@ -6,104 +6,81 @@
 
 ;; ### 1.1.1 Expressions
 
+486 ;; 486
+(+ 137 349) ;; 486
+(- 1000 334) ;; 666
+(* 5 99) ;; 495
+(/ 10 5) ;; 2
+(+ 2.7 10) ;; 12.7
 
-486
-;; 486
-(+ 137 349)
-;; 486
-(- 1000 334)
-;; 666
-(* 5 99)
-;; 495
-(/ 10 5)
-;; 2
-(+ 2.7 10)
-;; 12.7
+(+ 21 35 12 7) ;; 75
+(* 25 4 12) ;; 1200
 
-(+ 21 35 12 7)
-;; 75
-(* 25 4 12)
-;; 1200
-
-(+ (* 3 5) (- 10 6))
-;; 19
-
-(+ (* 3 (+	(* 2 4) (+ 3 5))) (+ (- 10 7) 6))
-;; 57
+(+ (* 3 5) (- 10 6)) ;; 19
+(+ (* 3 (+	(* 2 4) (+ 3 5))) (+ (- 10 7) 6)) ;; 57
 
 (+ (* 3
 			(+ (* 2 4)
 				 (+ 3 5)))
 	 (+ (- 10 7)
-			6))
-;; 57
+			6)) ;; 57
 
 ;; ### 1.1.2 Naming and the Environment
 
 (define size 2)
 
-size
-;; 2
-(* 5 size)
-;; 10
+size ;; 2
+(* 5 size) ;; 10
 
 (define pi 3.14159)
 (define radius 10)
-(* pi (* radius radius))
-;; 314.159
+(* pi (* radius radius)) ;; 314.159
 (define circumference (* 2 pi radius))
-circumference
-;; 62.8318
+circumference ;; 62.8318
 
 ;; ### 1.1.3 Evaluating Combinations
 
 (* (+ 2 (* 4 6))
-	 (+ 3 5 7))
-;; 390
+	 (+ 3 5 7)) ;; 390
 
 ;; ### 1.1.4 Compound Procedures
 
 (define (square x) (* x x))
 
-(square 21)
-;; 441
-(square (+ 2 5))
-;; 49
-(square (square 3))
-;; 81
+(square 21) ;; 441
+(square (+ 2 5)) ;; 49
+(square (square 3)) ;; 81
 
-;; (+ (square x) (square y))
+;; `(+ (square x) (square y))`
 
 (define (sum-of-squares x y)
 	(+ (square x) (square y)))
 
-(sum-of-squares 3 4)
-;; 25
+(sum-of-squares 3 4) ;; 25
 
 (define (f a)
 	(sum-of-squares (+ a 1) (* a 2)))
-(f 5)
-;; 136
+(f 5) ;; 136
 
 ;; ### 1.1.5 The Substitution Model for Procedure Application
 
-;; (f 5)
-;; (sum-of-squares (+ a 1 (* a 2)))
-;; (sum-of-squares (+ 5 1 (* 5 2)))
-;; (+ (square 6) (square 10))
-;; (+ (* 6 6) (* 10 10))
-;; (+ 36 100)
-;; 136
+;;	 (f 5)
+;;	 (sum-of-squares (+ a 1 (* a 2)))
+;;	 (sum-of-squares (+ 5 1 (* 5 2)))
+;;	 (+ (square 6) (square 10))
+;;	 (+ (* 6 6) (* 10 10))
+;;	 (+ 36 100)
+;;	 136
 
 ;; #### Applicative order versus normal order
 
-;; (f 5)
-;; (sum-of-squares (+ 5 1) (* 5 2))
-;; (+		(square (+ 5 1))			(square (* 5 2))	)
-;; (+		(* (+ 5 1) (+ 5 1))		(* (* 5 2) (* 5 2)))
-;; (+ (* 6 6) (* 10 10))
-;; (+ 36 100)
-;; 136
+;;	 (f 5)
+;;	 (sum-of-squares (+ 5 1) (* 5 2))
+;;	 (+		(square (+ 5 1))			(square (* 5 2))	)
+;;	 (+		(* (+ 5 1) (+ 5 1))		(* (* 5 2) (* 5 2)))
+;;	 (+ (* 6 6) (* 10 10))
+;;	 (+ 36 100)
+;;	 136
 
 ;; ### 1.1.6 Conditional Expressions and Predicates
 
@@ -121,7 +98,7 @@ circumference
 			(- x)
 			x))
 
-;; (and (> x 5) (< x 10))
+;; `(and (> x 5) (< x 10))`
 
 (define (>= x y) (or (> x y) (= x y)))
 
@@ -156,9 +133,9 @@ circumference
 ;; ##### Exercise 1.2
 ;; Translate the following expression into prefix form:
 
-;; 5 + 4 + (2 - (3 - (6 + 4/5)))
-;; -----------------------------
-;;				3(6 - 2)(2 - 7)
+;;	 5 + 4 + (2 - (3 - (6 + 4/5)))
+;;	 -----------------------------
+;;					3(6 - 2)(2 - 7)
 
 (/ (+ 5 4 (- 2 (- 3 (+ 6 (/ 4 5)))))
 	 (* 3	(- 6 2)	(- 2 7))) ;; -37/150
@@ -182,23 +159,31 @@ circumference
 (define (a-plus-abs-b a b)
 	((if (> b 0) + -) a b))
 
-;; If b > 0 then add a b, otherwise subtract: (if (> b 0) + -) returns either
-;; the plus or minus function (cleverly disguised as + and -).
+;; If *b > 0* then add *a* and *b*, otherwise subtract: `(if (> b 0) + -)`
+;; returns either the `plus` or `minus` function (cleverly disguised as `+` and
+;; `-`).
 
 ;; ##### Exercise 1.5
-;;
+;; Ben Bitdiddle has invented a test to determine whether the interpreter he is
+;; faced with is using applicative-order evaluation or normal-order evaluation.
+;; He defines the following two procedures:
 
 (define (p) (p))
 (define (test x y)
 	(if (= x 0) 0 y))
 
-;; (test 0 (p))
-;; Infinite loop for applicative-order evaluation.
-;; Return the function p for normal-order evaluation.
+;; Then he evaluates the expression
+;; `(test 0 (p))`
+;; What behavior will Ben observe with an interpreter that uses
+;; applicative-order evaluation? What behavior will he observe with an
+;; interpreter that uses normal-order evaluation? Explain your answer.
 
-;; If y is evaluated, it will loop forever.
+;; Applicative-order evaluation: This will result in an infinite loop because
+;; `(p)` will be evaluated even though it is never used.
 
-;; 1.1.7 Example: Square Roots by Newton's Method
+;; Normal-order evaluation: Returns `0` since we never evaluate `(p)`.
+
+;; ### 1.1.7 Example: Square Roots by Newton's Method
 
 (define (sqrt-iter guess x)
 	(if (good-enough? guess x)
@@ -217,41 +202,57 @@ circumference
 (define (sqrt x)
 	(sqrt-iter 1.0 x))
 
-(sqrt 9)
-;; 3.00009155413138
-(sqrt (+ 100 37))
-;; 11.704699917758145
-(sqrt (+ (sqrt 2) (sqrt 3)))
-;; 1.7739279023207892
-(square (sqrt 1000))
-;; 1000.000369924366
+(sqrt 9) ;; 3.00009155413138
+(sqrt (+ 100 37)) ;; 11.704699917758145
+(sqrt (+ (sqrt 2) (sqrt 3))) ;; 1.7739279023207892
+(square (sqrt 1000)) ;; 1000.000369924366
 
-;; Exercise 1.6
+;; ##### Exercise 1.6
+;; Alyssa P. Hacker doesn't see why `if` needs to be provided as a special
+;; form. "Why can't I just define it as an ordinary procedure in terms of
+;; `cond`?" she asks. Alyssa's friend Eva Lu Ator claims that this can indeed be
+;; done, and she defines a new version of `if`:
 
-;; Broken if
 (define (new-if predicate then-clause else-clause)
 	(cond (predicate then-clause)
 				(else else-clause)))
 
-(new-if (= 2 3) 0 5)
-;; 5
-(new-if (= 1 1) 0 5)
-;; 0
+;; Eva demonstrates the program for Alyssa:
+(new-if (= 2 3) 0 5) ;; 5
+(new-if (= 1 1) 0 5) ;; 0
 
-;; (define (sqrt-iter guess x)
-;;	(new-if (good-enough? guess x)
-;;					guess
-;;					(sqrt-iter (improve guess x) x)))
+;; Delighted, Alyssa uses `new-if` to rewrite the square-root program:
+
+;;	 (define (sqrt-iter guess x)
+;;		(new-if (good-enough? guess x)
+;;						guess
+;;						(sqrt-iter (improve guess x) x)))
 
 ;; The program will loop infinitely because the predicate expression will only
 ;; be evaluated once (to false) resulting in a infinite loop since it won't be
-;; reevaluated for each iteration,
+;; reevaluated for each iteration.
 
-;; Exercise 1.7
+;; ##### Exercise 1.7
+;; The `good-enough?` test used in computing square roots will not be very
+;; effective for finding the square roots of very small numbers. Also, in real
+;; computers, arithmetic operations are almost always performed with limited
+;; precision. This makes our test inadequate for very large numbers. Explain
+;; these statements, with examples showing how the test fails for small and
+;; large numbers. An alternative strategy for implementing `good-enough?`is to
+;; watch how `guess` changes from one iteration to the next and to stop when
+;; the change is a very small fraction of the guess. Design a square-root
+;; procedure that uses this kind of end test. Does this work better for small
+;; and large numbers?
 
 ;; TODO
 
-;; Exercise 1.8
+;; ##### Exercise 1.8
+;; Newton's method for cube roots is based on the fact that if *y* is an
+;; approximation to the cube root of *x*, then a better approximation is given
+;; by the value
+;;		x / y^2 + 2y
+;;		------------
+;;					3
 
 (define (cube x)
 	(* x x x))
@@ -267,21 +268,18 @@ circumference
 (define (cube-good-enough? guess x)
 	(< (abs (- (cube guess) x)) 0.001))
 
-(define (cbrt x)
+(define (cube-root x)
 	(cube-iter 1.0 x))
 
-(cbrt 27)
-;; 3.0000005410641766
+(cube-root 27) ;; 3.0000005410641766
 
-;; 1.1.8 Procedures as Black-Box Abstractions
-
-;; procedural abstraction
+;; ### 1.1.8 Procedures as Black-Box Abstractions
 
 (define (square x) (* x x))
 (define (square x) (exp (double (log x))))
 (define (double x) (+ x x))
 
-;; Local names
+;; #### Local names
 
 (define (square x) (* x x))
 (define (square y) (* y y))
@@ -290,9 +288,7 @@ circumference
 	(< (abs (- (square guess) x))
 		 0.001))
 
-;; bound variable, binds, free, scope, capturing
-
-;; Internal definitions and block structure
+;; #### Internal definitions and block structure
 
 (define (sqrt x)
 	(sqrt-iter 1.0 x))
@@ -316,8 +312,6 @@ circumference
 				(sqrt-iter (improve guess x) x)))
 	(sqrt-iter 1.0 x))
 
-;; block structure, lexical scoping
-
 (define (sqrt x)
 	(define (good-enough? guess)
 		(< (abs (- (square guess) x)) 0.001))
@@ -329,23 +323,14 @@ circumference
 				(sqrt-iter (improve guess))))
 	(sqrt-iter 1.0))
 
-;; 1.2 Procedures and the Processes They Generate
+;; ## 1.2 Procedures and the Processes They Generate
 
-;; local evolution, global
-
-;; 1.2.1 Linear Recursion and Iteration
-
-;; n! = n * (n - 1) * (n - 2) * ... * 3 * 2 * 1
-
-;; n! = n * [(n - 1) * (n - 2) * ... * 3 * 2 * 1] = n * (n - 1)!
+;; ### 1.2.1 Linear Recursion and Iteration
 
 (define (factorial n)
 	(if (= n 1)
 			1
 			(* n (factorial (- n 1)))))
-
-;; product <- counter * product
-;; counter <- counter + 1
 
 (define (factorial n)
 	(fact-iter 1 1 n))
@@ -356,23 +341,26 @@ circumference
 								 (+ counter 1)
 								 max-count)))
 
-;; deferred operations, recursive process, linear recursive process, iterative
-;; process, state variables, linear iterative process, stack, process,
-;; procedure, tail-recursive
+;; ##### Exercise 1.9
+;; Each of the following two procedures defines a method for adding two positive
+;; integers in terms of the procedures `inc`, which increments its arguments by
+;; 1, and `dec`, which decrements its argument by 1.
 
-;; Exercise 1.9
+;;		(define (+ a b)
+;;			(if (= a 0) b (inc (+ (dec a) b))))
 
-;; (define (+ a b)
-;;	(if (= a 0) b (inc (+ (dec a) b))))
-;; recursive
+;;		(define (+ a b)
+;;			(if (= a 0) b (+ (dec a) (inc b))))
 
-;; (define (+ a b)
-;;	(if (= a 0) b (+ (dec a) (inc b))))
-;; iterative
+;; Using the substitution model, illustrate the process generated by each
+;; procedure in evaluating `(+ 4 5)`. Are these processes iterative or
+;; recursive?
 
 ;; TODO
 
-;; Exercise 1.10
+;; ##### Exercise 1.10
+;; The following procedure computes a mathematical function called Ackermann's
+;; function.
 
 (define (A x y)
 	(cond ((= y 0) 0)
@@ -380,42 +368,30 @@ circumference
 				((= y 1) 2)
 				(else (A (- x 1) (A x (- y 1))))))
 
-(A 1 10)
-;; 1024
-(A 2 4)
-;; 65536
-(A 3 3)
-;; 65536
+;; What are the values of the following expressions?
 
-(define (f n) (A 0 n))
-;; f compute 2*n
-(define (g n) (A 1 n))
-;; g computes 2^n
-(h 1)
-(define (h n) (A 2 n))
-;; h computes 2^2^n
+(A 1 10) ;; 1024
+(A 2 4) ;; 65536
+(A 3 3) ;; 65536
 
-;; 1.2.2 Tree Recursion
+;; Consider the following procedures, where `A` is the procedure defined above:
 
-;; tree recursion
+(define (f n) (A 0 n))	 ;; f compute 2*n
+(define (g n) (A 1 n))	 ;; g computes 2^n
+(define (h n) (A 2 n))	 ;; h computes 2^2^n
+(define (k n) (* 5 n n)) ;; k computes 5n^2
 
-;; 0,1,1,2,3,5,8,13,21,...
+;; Give concise mathematical definitions for the functions computed by the
+;; procedures `f`,`g` and `h` for positive integer values of `n`. For example,
+;; `(k, n)` computes *5n^2*.
 
-;;					/ 0										if n = 0,
-;; Fib(n) = | 1										if n = 1,
-;;					\ Fib(n-1) + Fib(n-2) otherwise.
+;; ### 1.2.2 Tree Recursion
 
 (define (fib n)
 	(cond ((= n 0) 0)
 				((= n 1) 1)
 				(else (+ (fib (- n 1))
 								 (fib (- n 2))))))
-
-(fib 8)
-;; 21
-
-;; a <- a + b
-;; b <- a
 
 (define (fib n)
 	(fib-iter 1 0 n))
@@ -424,9 +400,7 @@ circumference
 			b
 			(fib-iter (+ a b) a (- count 1))))
 
-(fib 8)
-
-;; Example: Counting change
+;; #### Example: Counting change
 
 (define (count-change amount)
 	(cc amount 5))
@@ -448,24 +422,33 @@ circumference
 				((= kinds-of-coins 4) 25)
 				((= kinds-of-coins 5) 50)))
 
-(count-change 100)
-;; 292
+(count-change 100) ;; 292
 
-;; tabulation/memoization,
+;; ##### Exercise 1.11
+;; A function *f* is defined by the rule that *f(n) = n* if *n < 3* and
+;; *f(n) = f(n - 1) + 2f(n - 2) + 3f(n - 3)* if *n >= 3*. Write a procedure that
+;; computes *f* by means of a recursive process. Write a procedure that computes
+;; *f* by means of an iterative process.
 
-;; Exercise 1.11
-
-(define (f n)
+(define (f-rec n)
 	(cond ((< n 3) n)
-				(else (+ (f (- n 1))
-								 (* 2 (f (- n 2)))
-								 (* 3 (f (- n 3)))))))
-
-;; ==> 0, 1, 2, 4, 11, 25, 59, 142, 335, 796, 892
+				(else (+ (f-rec (- n 1))
+								 (* 2 (f-rec (- n 2)))
+								 (* 3 (f-rec (- n 3)))))))
+;; *==> 0, 1, 2, 4, 11, 25, 59, 142, 335, 796, 1892*
 
 ;; TODO f-iter
 
-;; Exercise 1.12
+;; ##### Exercise 1.12
+;; The following pattern of numbers is called *Pascal's triangle*.
+;;			 1
+;;			1 1
+;;		 1 2 1
+;;		1 3 3 1
+;;	 1 4 6 4 1
+;; The numbers at the edge of the triangle are all 1, and each number inside the
+;; triangle is the sum of the two numbers above it. Write a procedure that
+;; computes elements of Pascal's triangle by means of a recursive process.
 
 (define (binomial n k)
 	(cond ((= k 0) 1)
@@ -474,22 +457,34 @@ circumference
 				 (+ (binomial (- n 1) (- k 1))
 						(binomial (- n 1) k)))))
 
-(binomial 4 2)
-;; ==> 6
+(binomial 4 2) ;; 6
 
-;; Exercise 1.13
-
-;; TODO
-
-;; 1.2.3 Orders of Growth
-
-;; order of growth, Theta(f(n))
-
-;; Exercise 1.14
+;; ##### Exercise 1.13
+;; Prove that *Fib(n)* is the closest integer to *phi^n/sqrt(5)*, where
+;; *phi = (1 + sqrt(5))/2*. Hint: let *psi = (1 - sqrt(5))/2*. Use induction and the
+;; definition of the Fibonacci numbers to prove that *Fib(n) = (phi^n -
+;; psi^n)/sqrt(5)*.
 
 ;; TODO
 
-;; Exercise 1.15
+;; ### 1.2.3 Orders of Growth
+
+;; ##### Exercise 1.14
+;; Draw the tree illustrating the process generated by the `count-change`
+;; procedure of Section 1.2.2 in making change for 11 cents. What are the orders
+;; of growth of the space and number of steps used by this process as the amount
+;; to be changed increases?
+
+;; TODO
+
+;; ##### Exercise 1.15
+;; The sine of an angle (specified in radians) can be computed by making use of
+;; the approximation *sin x ~= x* if *x* is sufficiently small, and the
+;; trigonometric identity
+;; *sin x = 3 sin x/3 - 4 sin^3 x/3*
+;; to reduce the size of the argument of *sin*. (For purposes of this exercise
+;; an angle is considered "sufﬁciently small" if its magnitude is not greater
+;; than 0.1 radians). These ideas are incorporated in the following procedures:
 
 (define (cube x)
 	(* x x x))
@@ -502,12 +497,16 @@ circumference
 			angle
 			(p (sine (/ angle 3.0)))))
 
-(sine 12.15)
-;; a. 5 times: 12.15 -> 4.05 -> 1.34999 -> 0.44999 -> 0.14999 -> 0.04999
+;; **a.** How many times is the procedure `p` applied when (`sine 12.15`) is
+;; evaluated?
+;; ==> 5 times: *12.15 -> 4.05 -> 1.34999 -> 0.44999 -> 0.14999 -> 0.04999*
 
-;; b. (ceiling (/ (log (/ a 0.1)) (log 3)))
+;; **b:** What is the order of growth in space and number of steps (as a
+;; function of *a*) used by the process generated by the `sine` procedure when
+;; (`sine a`) is evaluated?
+;; ==> *(ceiling (/ (log (/ a 0.1)) (log 3)))*
 
-;; 1.2.4 Exponentiation
+;; ### 1.2.4 Exponentiation
 
 ;; b^n = b * b^(n-1)
 ;; b^0 = 1
