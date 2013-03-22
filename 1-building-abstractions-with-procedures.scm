@@ -508,16 +508,12 @@ circumference ;; 62.8318
 
 ;; ### 1.2.4 Exponentiation
 
-;; b^n = b * b^(n-1)
-;; b^0 = 1
-
 (define (expt b n)
   (if (= n 0)
       1
       (* b (expt b (- n 1)))))
 
-(expt 2 5)
-;; 32
+(expt 2 5) ;; 32
 
 (define (expt b n)
   (expt-iter b n 1))
@@ -528,23 +524,22 @@ circumference ;; 62.8318
                  (- counter 1)
                  (* b product))))
 
-(expt 2 5)
-;; 32
+(expt 2 5) ;; 32
 
 (define (fast-expt b n)
   (cond ((= n 0) 1)
         ((even? n) (square (fast-expt b (/ n 2))))
         (else (* b (fast-expt b (- n 1))))))
 
-(fast-expt 2 5)
-;; 32
+(fast-expt 2 5) ;; 32
 
-;; (define (even? n)
-;;  (= (remainder n 2) 0))
+;;    (define (even? n)
+;;      (= (remainder n 2) 0))
 
-;; Exercise 1.16
-
-;; invariant quantity
+;; ##### Exercise 1.16
+;; Design a procedure that evolves an iterative exponentiation process that uses
+;; successive squaring and uses a logarithmic number of steps, as does
+;; `fast-expt`.
 
 (define (fast-expt-aux b n)
   (define (iter a b n)
@@ -556,12 +551,22 @@ circumference ;; 62.8318
 (fast-expt 2 5) ;; 32
 (fast-expt-aux 2 5) ;; 32
 
-;; Exercise 1.17
+;; ##### Exercise 1.17
+;; The exponentiation algorithms in this section are based on performing
+;; exponentiation by means of repeated multiplication. In a similar way, one can
+;; perform integer multiplication by means of repeated addition. The following
+;; multiplication procedure is analogous to the `expt` procedure:
 
-(define (mult a b)
-  (if (= b 0)
-      0
-      (+ a (mult a (- b 1)))))
+;;    (define (* a b)
+;;      (if (= b 0)
+;;          0
+;;          (+ a (* a (- b 1)))))
+
+;; This algorithm takes a number of steps that is linear in `b`. Now suppose we
+;; include, together with addition, operations `double`, which doubles an
+;; integer, and `halve`, which divides an (even) integer by 2. Using these,
+;; design a multiplication procedure analogous to `fast-expt` that uses a
+;; logarithmic number of steps.
 
 (define (double n)
   (if (= n 0)
@@ -586,7 +591,10 @@ circumference ;; 62.8318
 
 (fast-mult 7 8) ; 56
 
-;; Exercise 1.18
+;; ##### Exercise 1.18
+;; Using the results of Exercise 1.16 and Exercise 1.17, devise a procedure that
+;; generates an iterative process for multiplying two integers in terms of
+;; adding, doubling, and halving and uses a logarithmic number of steps.
 
 (define (russian-peasant b n)
   (define (iter a b n)
@@ -597,7 +605,20 @@ circumference ;; 62.8318
 
 (russian-peasant 4 7) ; 28
 
-;; Exercise 1.19
+;; ##### Exercise 1.19
+;; There is a clever algorithm for computing the Fibonacci numbers in a
+;; logarithmic number of steps. Recall the transformation of the state variable
+;; *a* and *b* in the `fib-iter` process of Section 1.2.2: *a <- a + b* and *b
+;; <- a*. Call this transformation *T*, and observe that applying *T* over and
+;; over again *n* times, starting with 1 and 0, produces the pair *Fib(n+1)* and
+;; *Fib(n)*. In other words, the Fibonacci numbers are produced by applying
+;; *T^n*, the *n^{th}* power of the transformation *T*, starting with the pair
+;; *(1,0)*. Now consider *T* to be the special case of *p = 0* and *q = 1* in a
+;; family of transformation *T_{pq}*, where *T_{pq}* transforms the pair *(a,
+;; b)* according to *a <- bq + aq + ap* and *b <- bp + aq*. Show that if we
+;; apply such a transformation *T_{pq}* twice, the effect is the same as using a
+;; single transformation *T_{p'q'}* of the same form, and compute *p'* and *q'*
+;; in terms of *p* and *q*.
 
 ;; a' <- bq + aq + ap = (p + q)a + bq
 ;; b' <- bp + aq
@@ -607,6 +628,11 @@ circumference ;; 62.8318
 ;; b'' <- b'p + a'q = (bp + aq)p + ((p+q)a + bq)q
 ;;                  = bp^2 + apq + apq + aq^2 + bq^2
 ;;                  = (2pq + q^2)a (p^2 + q^2)b
+
+;; This gives us an explicit way to square these transformations, and thus we
+;; can compute *T^n* using successive squaring, as in the `fast-expt`
+;; procedure. Put this all together to complete the following procedure, which
+;; runs in a logarithmic number of steps.
 
 (define (square x) (* x x))
 
@@ -627,61 +653,57 @@ circumference ;; 62.8318
                         q
                         (- count 1)))))
 
-(fib 0)
-(fib 1)
-(fib 2)
-(fib 3)
-(fib 4)
-(fib 5)
-(fib 6)
+(fib 0) ;; 0
+(fib 1) ;; 1
+(fib 2) ;; 1
+(fib 3) ;; 2
+(fib 4) ;; 3
+(fib 5) ;; 5
+(fib 6) ;; 8
 
-;; 1.2.5 Greatest Common Divisor
+;; ### 1.2.5 Greatest Common Divisor
 
-;; GCD(a,b) = GCD(b,r)
-
-;; GCD(206,40) = GCD(40,6)
-;;             = GCD(6,4)
-;;             = GCD(4,2)
-;;             = GCD(2,0)
-;;             = 2
-
-;; Euclid's Algorithm
+;; #### Euclid's Algorithm
 
 (define (gcd a b)
   (if (= b 0)
       a
       (gcd b (remainder a b))))
 
-;; Lame's Theorem: If Euclid's Algorithm requires $k$ steps to compute the GCD
-;; of some pair, then the smaller number in the pair must be greater than or
-;; equal to the $k^{th}$ Fibonacci number.
-
-;; Exercise 1.20
+;; ##### Exercise 1.20
+;; The process that a procedure generates is of course dependent on the rule
+;; used by the interpreter. As an example, consider the iterative `gcd`
+;; procedure given above. Suppose we were to interpret this procedure using
+;; normal-order evaluation, as discussed in Section 1.1.5. Using the
+;; substitution method (for normal order), illustrate the process generated in
+;; evaluating `(gcd 206 40)` and indicate the `remainder` operations that are
+;; actually performed. How many `remainder` operations are actually performed in
+;; the normal-order evaluation of `(gcd 206 40)`? In the applicative-order
+;; evaluation?
 
 ;; TODO
 
-;; 1.2.6 Example: Testing for Primality
+;; ### 1.2.6 Example: Testing for Primality
 
-;; Searching for divisors
+;; #### Searching for divisors
 
 (define (smallest-divisor n)
   (find-divisor n 2))
+
 (define (find-divisor n test-divisor)
   (cond ((> (square test-divisor) n) n)
         ((divides? test-divisor n) test-divisor)
         (else (find-divisor n (+ test-divisor 1)))))
+
 (define (divides? a b) (= (remainder b a) 0))
+
 (define (prime? n)
   (= n (smallest-divisor n)))
 
-(prime? 8)
-(prime? 13)
+(prime? 8) ;; #f
+(prime? 13) ;; #t
 
-;; The Fermat test
-
-;; Fermat's Little Theorem: If $n$ is a prime number and $a$ is any positive
-;; integer less than $n$, then $a$ raised to the $n^{th}$ power is congruent to
-;; $a$ modulo $n$.
+;; #### The Fermat test
 
 (define (expmod base exp m)
   (cond ((= exp 0)
@@ -697,11 +719,7 @@ circumference ;; 62.8318
              (expmod base (- exp 1) m))
           m))))
 
-(expmod 4 5 5)
-
-;; our poorly implemented random function
-(define (random n)
-  (/ n 2))
+(expmod 4 5 5) ;; 4
 
 (define (fermat-test n)
   (define (try-it a)
@@ -713,55 +731,155 @@ circumference ;; 62.8318
         ((fermat-test n) (fast-prime? n (- times 1)))
         (else #f)))
 
-(fast-prime? 13 1)
+(fast-prime? 13 1);; #t
 
-;; Probabilistic methods
+;; #### Probabilistic methods
 
-;; Carmichael numbers: those that fool the Fermat test.
-
-;; Probabilistic algorithms.
-
-;; Exercise 1.21
+;; ##### Exercise 1.21
+;; Use the `smallest-divisor` procedure to find the smallest divisor of each of
+;; the following numbers: 199, 1999, 19999.
 
 (smallest-divisor 199) ;; 199
 (smallest-divisor 1999) ;; 1999
 (smallest-divisor 19999) ;; 7
 
-;; Exercise 1.22
+;; ##### Exercise 1.22
+;; Most Lisp implementations include a primitive called `runtime` that returns
+;; an integer that specifies the amount of time the system has been running
+;; (measured, for example, in microseconds). The following `timed-prime-test`
+;; procedure, when called with integer *n*, prints *n* and checks to see if *n*
+;; is prime. If *n* is prime, the procedure prints three asterisks followed by
+;; the amount of time used in performing the test.
+
+(define (timed-prime-test n)
+  (newline)
+  (display n)
+  (start-prime-test n (current-milliseconds)))
+
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-prime (- (runtime) start-time))))
+
+(define (report-prime elapsed-time)
+  (display " *** ") (display elapsed-time))
+
+;; Using this procedure, write a procedure `search-for-primes` that checks the
+;; primality of consecutive odd integers in a specified range. Use your
+;; procedure to find the three smallest primes larger than 1000; larger than
+;; 10,000; larger than 100,000; larger than 1,000,000. Note the time needed to
+;; test each prime. Since the testing algorithm has order of growth
+;; *theta(sqrt(n))*, you should expect that testing for primes around 10,000 should
+;; take about *sqrt(10)* times as long as testing for primes around 1000. Do
+;; your timing data bear this out? How well do the data for 100,000 and
+;; 1,000,000 support the *theta(sqrt(n))* prediction? Is your result compatible
+;; with the notion that programs on your machine run in time proportional to the
+;; number of steps required for the computation?
 
 ;; TODO
 
-;; Exercise 1.23
+;; ##### Exercise 1.23
+;; The `smallest-divisor` procedure shown at the start of this section does lots
+;; of needless testing: After it checks to see if the number is divisble by 2
+;; there is no point in checking to see if it is divisible by any larger even
+;; numbers. This suggests that the values used for `test-divisor` should not be
+;; 2, 3, 4, 5, 6, ...,, but rather 2, 3, 5, 7, 9, .... To implement this change,
+;; define a procedure `next` that returns 3 if its input is equal to 2 and
+;; otherwise return its input plus 2. Modify the `smallest-divisor` procedure to
+;; use `(next test-divisor)` instead of `(+ test-divisor 1)`. With
+;; `timed-prime-test` incorporating this modified version of `smallest-divisor`,
+;; run the test for each of the 12 primes found in Exercise 1.22. Since this
+;; modification halves the number of test steps, you should expect it to run
+;; about twice as fast. Is this expectation confirmed? If not, what is the
+;; observed ratio of the speeds of the two algorithms, and how do you explain
+;; the fact that it is different from 2?
 
 ;; TODO
 
-;; Exercise 1.24
+;; ##### Exercise 1.24
+;; Modify the `timed-prime-test` procedure of Exercise 1.22 to use `fast-prime?`
+;; (the Fermat method), and test each of the 12 primes you found in that
+;; exercise. Since the Fermat test has *theta(log n)* growth, how would you
+;; expect the time to test primes near 1,000,000 to compare with the time needed
+;; to test primes near 1000? Do your data bear this out? Can you explain any
+;; discrepancy you find?
 
 ;; TODO
 
-;; Exercise 1.25
+;; ##### Exercise 1.25
+;; Alyssa P. Hacker complains that we went to a lot of extra work in writing
+;; `expmod`. After all, she says, since we already know how to compute
+;; exponentials, we could have simply written
+
+;;    (define (expmod base exp m)
+;;      (remainder (fast-expt base exp) m))
+
+;; Is she correct? Would this procedure serve as well for our fast prime tester?
+;; Explain.
 
 ;; TODO
 
-;; Exercise 1.26
+;; ##### Exercise 1.26
+;; Louis Reasoner is having great difficulty doing Exercise 1.24. His
+;; `fast-prime?` test seems to run more slowly than his `prime?` test. Louis
+;; calls his friend Eva Lu Ator over to help. When they examine Louis' code,
+;; they find that he has rewritten the `expmod` procedure to use an explicit
+;; multiplication, rather than calling `square`:
+
+;;    (define (expmod base exp m)
+;;      (cond ((= exp 0) 1)
+;;            ((even? exp)
+;;            (remainder (* (expmod base (/ exp 2) m)
+;;                          (expmod base (/ exp 2) m))
+;;                       m))
+;;            (else
+;;              (remainder (* base
+;;                            (expmod base (- exp 1) m))
+;;                         m))))
+
+;; "I don't see what difference that could make" says Louis. "I do" says
+;; Eva. "By writing the procedure like that, you have transformed the *theta(log
+;; n)* process into a *theta(n)* process." Explain.
 
 ;; TODO
 
-;; Exercise 1.27
+;; ##### Exercise 1.27
+;; Demonstrate that the Carmichael numbers listed in Footnote 1.47 really do
+;; fool the Fermat test. That is, write a procedure that takes an integer *n*
+;; and tests whether *a^n* is congruent to *a* modulo *n* for every *a < n*, and
+;; try your procedure on the given Carmichael numbers.
 
 ;; TODO
 
-;; Exercise 1.28
+;; ##### Exercise 1.28
+
+;; One variant of the Fermat test that cannot be fooled is called the
+;; *Miller-Rabin test* (Miller 1976; Rabin 1980). This starts from an alternate
+;; form of Fermat’s Little Theorem, which states that if *n* is a prime number
+;; and *a* is any positive integer less than *n*, then *a* raised to the *(n -
+;; 1)*-st power is congruent to 1 modulo *n*. To test the primality of a number
+;; *n* by the Miller-Rabin test, we pick a random number *a < n* and raise *a*
+;; to the *(n - 1)*-st power modulo *n* using the expmod procedure. However,
+;; whenever we perform the squaring step in `expmod`, we check to see if we have
+;; discovered a "nontrivial square root of 1 modulo *n*," that is, a number not
+;; equal to 1 or *n - 1* whose square is equal to 1 modulo *n*. It is possible
+;; to prove that if such a nontrivial square root of 1 exists, then *n* is not
+;; prime. It is also possible to prove that if *n* is an odd number that is not
+;; prime, then, for at least half the numbers *a < n*, computing *a^{n-1}* in
+;; this way will reveal a nontrivial square root of 1 modulo *n*. (This is why
+;; the Miller-Rabin test cannot be fooled.) Modify the `expmod` procedure to
+;; signal if it discovers a nontrivial square root of 1, and use this to
+;; implement the Miller-Rabin test with a procedure analogous to
+;; `fermat-test`. Check your procedure by testing various known primes and
+;; non-primes. Hint: One convenient way to make `expmod` signal is to have it
+;; return 0.
 
 ;; TODO
 
-;; 1.3 Formulating Abstractions with Higher-Order Procedures
+;; ## 1.3 Formulating Abstractions with Higher-Order Procedures
 
 (define (cube x) (* x x x))
 
-;; /higher order procedures/
-
-;; 1.3.1 Procedures as Arguments
+;; ### 1.3.1 Procedures as Arguments
 
 (define (sum-integers a b)
   (if (> a b)
@@ -781,13 +899,11 @@ circumference ;; 62.8318
       (+ (/ 1.0 (* a (+ a 2)))
          (pi-sum (+ a 4) b))))
 
-;; (define (<name> a b)
-;;    (if (> a b)
-;;        0
-;;        (+ (<term> a)
-;;           (<name> (<next> a) b))))
-
-;; *summation of a series*
+;;    (define (<name> a b)
+;;      (if (> a b)
+;;          0
+;;          (+ (<term> a)
+;;             (<name> (<next> a) b))))
 
 (define (sum term a next b)
   (if (> a b)
@@ -796,20 +912,16 @@ circumference ;; 62.8318
          (sum term (next a) next b))))
 
 (define (inc n) (+ n 1))
-
 (define (sum-cubes a b)
   (sum cube a inc b))
 
-(sum-cubes 1 10)
-;; 3025
+(sum-cubes 1 10) ;; 3025
 
 (define (identity x) x)
-
 (define (sum-integers a b)
   (sum identity a inc b))
 
-(sum-integers 1 10)
-;; 55
+(sum-integers 1 10) ;; 55
 
 (define (pi-sum a b)
   (define (pi-term x)
@@ -818,8 +930,7 @@ circumference ;; 62.8318
     (+ x 4))
   (sum pi-term a pi-next b))
 
-(* 8 (pi-sum 1 1000))
-;; 3.139592655589783
+(* 8 (pi-sum 1 1000)) ;; 3.139592655589783
 
 (define (integral f a b dx)
   (define (add-dx x)
@@ -827,11 +938,8 @@ circumference ;; 62.8318
   (* (sum f (+ a (/ dx 2.0)) add-dx b)
      dx))
 
-(integral cube 0 1 0.01)
-;; 0.24998750000000042
-
-(integral cube 0 1 0.001)
-;; 0.249999875000001
+(integral cube 0 1 0.01) ;; 0.24998750000000042
+(integral cube 0 1 0.001) ;; 0.249999875000001
 
 ;; Exercise 1.29
 
