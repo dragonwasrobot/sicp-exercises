@@ -15,28 +15,25 @@ Julie Sussman.
 
 ## To-do
 
-- Reading+Exercises
-  - Chapter 1.
-    - Exercise 1.7
-    - Exercise 1.9
-    - Exercise 1.11 (partly)
-    - Exercise 1.13
-    - Exercise 1.14
-    - Exercise 1.15
-    - Exercise 1.20
-    - Exercise 1.22
-    - Exercise 1.23
-    - Exercise 1.24
-    - Exercise 1.25
-    - Exercise 1.26
-    - Exercise 1.27
-    - Exercise 1.28
-    - Exercise 1.29
-    - Exercise 1.30
-    - Exercise 1.31
-    - Exercise 1.32
-    - Exercise 1.33
-
-  - Chapter 2+.
-- Misc
-  - Proofread/cleanup from Chapter 1.3.1 and onwards.
+- Chapter 1
+  - Exercise 1.7
+  - Exercise 1.9
+  - Exercise 1.11 (partly)
+  - Exercise 1.13
+  - Exercise 1.14
+  - Exercise 1.15
+  - Exercise 1.20
+  - Exercise 1.22
+  - Exercise 1.23
+  - Exercise 1.24
+  - Exercise 1.25
+  - Exercise 1.26
+  - Exercise 1.27
+  - Exercise 1.28
+  - Exercise 1.29
+  - Exercise 1.30
+  - Exercise 1.31
+  - Exercise 1.32
+  - Exercise 1.33
+- Chapter 2+
+  - Everything
