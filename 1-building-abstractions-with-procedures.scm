@@ -985,11 +985,37 @@ circumference ;; 62.8318
 ;; TODO
 
 ;; ##### Exercise 1.32
+;; a. Show that `sum` and `product` (Exercise 1.31) are both special cases of a
+;; still more general notion called `accumulate` that combines a collection of
+;; terms, using some general accumulation function:
+;;    (accumulate combiner null-value term a next b)
+;; Accumulate takes as arguments the same term and range speciﬁcations as `sum`
+;; and `product`, together with a `combiner` procedure (of two arguments) that
+;; speciﬁes how the current term is to be combined with the accumulation of the
+;; preceding terms and a `null-value` that speciﬁes what base value to use when
+;; the terms run out. Write `accumulate` and show how sum and product can both
+;; be defined as simple calls to `accumulate`.
 
+;; b. If your `accumulate` procedure generates a recursive process, write one
+;; that generates an iterative process. If it generates an iterative process,
+;; write one that generates a recursive process
 
 ;; TODO
 
 ;; ##### Exercise 1.33
+;; You can obtain an even more general version of `accumulate` (Exercise 1.32)
+;; by introducing the notion of a *filter* on the terms to be combined. That is,
+;; combine only those terms derived from values in the range that satisfy a
+;; speciﬁed condition.  The resulting `filtered-accumulate` abstraction takes
+;; the same arguments as accumulate, together with an additional predicate of
+;; one argument that speciﬁes the ﬁlter. Write `filtered-accumulate` as a
+;; procedure. Show how to express the following using `filtered-accumulate`:
+
+;; a. the sum of the squares of the prime numbers in the interval *a* to *b*
+;; (assuming that you have a `prime?` predicate already written).
+
+;; b. the product of all the positive integers less than *n* that are relatively
+;; prime to *n* (i.e., all positive integers *i < n* such that *GCD(i, n) = 1*).
 
 ;; TODO
 
@@ -1012,8 +1038,6 @@ circumference ;; 62.8318
           b)
      dx))
 
-;; (lambda (<formal-parameters>) <body>)
-
 (define (plus4 x) (+ x 4))
 
 (define plus4 (lambda (x) (+ x 4)))
@@ -1021,7 +1045,7 @@ circumference ;; 62.8318
 ((lambda (x y z) (+ x y (square z)))
  1 2 3)
 
-;; #### Using let to create local variables
+;; #### Using `let` to create local variables
 
 (define (f x y)
   (define (f-helper a b)
@@ -1046,12 +1070,6 @@ circumference ;; 62.8318
        (* y b)
        (* a b))))
 
-;; (let ((<var_1> <exp_1>)
-;;       (<var_2> <exp_2>)
-;;       ...
-;;       (<var_n> <exp_n>))
-;;    <body>)
-
 (define (f x y)
   (define a (+ 1 (* x y)))
   (define b (- 1 y))
@@ -1059,17 +1077,22 @@ circumference ;; 62.8318
      (* y b)
      (* a b)))
 
-;; Exercise 1.34
+;; ##### Exercise 1.34
+;; Suppose we define the procedure
+;;    (define (f g) (g 2))
+;; Then we have
+;;    (f square) ;; 4
+;;    (f (lambda (z) (* z (+ z 1)))) ;; 6
+;; What happens if we (perversely) ask the interpreter to evaluate the
+;; combination `(f f)`? Explain.
 
-;; When we evaluate (f f), we get (lambda (g) (g 2) 2) resulting in
-;; (2 '(2)) which then results in an error as it tries to apply
-;; the value 2 to the function 2.
+;; When we evaluate `(f f)`, we get `(lambda (g) (g 2) 2)` resulting in
+;; `(2 '(2))` which then results in an error as it tries to apply
+;; the value 2 to the function `2`.
 
 ;; ### 1.3.3 Procedures as General Methods
 
 ;; #### Finding roots of equations by the half-interval method
-
-;; *half-interval method*.
 
 (define (search f neg-point pos-point)
   (let ((midpoint (average neg-point pos-point)))
@@ -1093,17 +1116,13 @@ circumference ;; 62.8318
            (search f b a))
           (else (error "Values are not of opposite sign" a b)))))
 
-(half-interval-method sin 2.0 4.0)
-;; 3.14111328125
+(half-interval-method sin 2.0 4.0) ;; 3.14111328125
 
 (half-interval-method (lambda (x) (- (* x x x) (+ (* 2 x) 3)))
                       1.0
-                      2.0)
-;; 1.89306640625
+                      2.0) ;; 1.89306640625
 
 ;; #### Finding fixed points of functions
-
-;; *fixed point*
 
 (define tolerance 0.00001)
 
@@ -1118,47 +1137,46 @@ circumference ;; 62.8318
           (try next))))
   (try first-guess))
 
-(fixed-point cos 1.0)
-;; 0.7390822985224023
+(fixed-point cos 1.0) ;; 0.7390822985224023
 
-(fixed-point (lambda (y) (+ (sin y) (cos y))) 1.0)
-;; 1.2587315962971173
+(fixed-point (lambda (y) (+ (sin y) (cos y))) 1.0) ;; 1.2587315962971173
 
-(define (sqrt x) ; buggy
-  (fixed-point (lambda (y) (/ x y)) 1.0))
+;;    (define (sqrt x)
+;;      (fixed-point (lambda (y) (/ x y)) 1.0))
 
 (define (sqrt x)
   (fixed-point (lambda (y) (average y (/ x y)) 1.0)))
 
-;; *average damping*
+;; ##### Exercise 1.35
+;; Show that the golden ratio *phi* (Section 1.2.2) is a fixed point of the
+;; transformation *x -> 1 + 1 / x*, and use this fact to compute *phi* by means
+;; of the `fixed-point` procedure.
 
-;; Exercise 1.35
+;;    phi = 1 + 1 / phi
+;;    phi ^ 2 = phi + 1
+;;    phi ^ 2 - phi - 1 = 0
+;;        1 + sqrt 5                         1 - sqrt 5
+;;    phi = ------- = 1.61803399887 and phi = ------- = -0.6180339897
+;;           2                               2
 
-;; Show that the golden ratio phi is a fixed point of the transformation
-;; x |-> 1 + 1 / x.
+;;        1 + sqrt 5
+;;    phi = ------- = 1.61803399887...
+;;           2
 
-;; phi = 1 + 1 / phi
-;; phi ^ 2 = phi + 1
-;; phi ^ 2 - phi - 1 = 0
-;;     1 + sqrt 5                         1 - sqrt 5
-;; phi = ------- = 1.61803399887 and phi = ------- = -0.6180339897
-;;        2                               2
-
-;;     1 + sqrt 5
-;; phi = ------- = 1.61803399887...
-;;        2
-
-;; Use this fact to compute phi by means of the `fixed-point` procedure.
-
-;; golden ratio: phi = (/ (+ 1 (sqrt 5)) 2) = 1.6180339887...
+;; *golden ratio: phi = (/ (+ 1 (sqrt 5)) 2) = 1.6180339887...*
 
 (define golden-ratio (fixed-point (lambda (y) (+ 1 (/ 1 y))) 1.0))
 ;; 1.6180327868852458
 
-;; Exercise 1.36
+;; ##### Exercise 1.36
 
 ;; Modify `fixed-point` so that it prints the sequence of approximations it
-;; generates, using the `newline` and `display` primitives.
+;; generates, using the `newline` and `display` primitives shown in Exercise
+;; 1.22. Then find a solution to *x^x = 1000* by finding a fixed point of *x ->
+;; log(1000)/log(x)*. (Use Scheme's primitive `log` procedure, which computes
+;; natural logarithms). Compare the number of steps this takes with and without
+;; average damping. (Note that you cannot start `fixed-point` with a guess of 1,
+;; as this would cause division by *log(1)=0*).
 
 (define (fixed-point f first-guess)
   (define (close-enough? v1 v2)
@@ -1177,10 +1195,9 @@ circumference ;; 62.8318
 
 (define x-power-x (fixed-point (lambda (y) (/ (log 1000) (log y))) 2.0))
 
-x-power-x
-;; 4.555532270803653
+x-power-x ;; 4.555532270803653
 
-;; Exercise 1.37
+;; ##### Exercise 1.37
 
 ;; a.
 
