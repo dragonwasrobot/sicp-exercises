@@ -1199,12 +1199,42 @@ x-power-x ;; 4.555532270803653
 
 ;; ##### Exercise 1.37
 
-;; a.
+;; a. An infinite *continued fraction* is an expression of the form
 
-;; *continued fraction*
-;; *k-term finite continued fraction*
+;;                  N_1
+;;    f = ----------------------
+;;                     N_2
+;;          D_1 + --------------
+;;                        N_3
+;;              D_2 + ----------
+;;                     D_3 + ...
 
-;; (/ N_1 (+ D_1 (/ N_2 (+ D_2 (...)))))
+;; As an example, one can show that the infinite continued fraction expansion
+;; with the *N_i* and the *D_i* all equal to 1 produces *1/phi*, where *phi* is
+;; the golden ratio. One way to approximate an infinite continued fraction is to
+;; truncate the expansion after a given number of terms. Such a truncation - a
+;; so-called *k-term finite continued fraction* - has the form
+
+;;                  N_1
+;;    f = ----------------------
+;;                     N_2
+;;          D_1 + --------------
+;;                        N_k
+;;              ... + ----------
+;;                        D_k
+
+;; Suppose that `n` and `d` are procedures of one argument (the term index *i*)
+;; that return the *N_i* and *D_i* of the terms of the continued
+;; fraction. Define a procedure `cont-frac` such that evaluating `(cont-frac n d
+;; k)` computes the values of the *k*-term finite continued fraction. Check your
+;; procedure by approximating *1/phi* using
+
+;;    (cont-frac (lambda (i) 1.0)
+;;               (lambda (i) 1.0)
+;;               k)
+
+;; for successive values of *k*. How large must you make *k* in order to get an
+;; approximation that is accurate to 4 decimal places?
 
 (define (cont-frac-rec n d k)
   (define (cont-rec i)
@@ -1213,16 +1243,17 @@ x-power-x ;; 4.555532270803653
         (/ (n i) (+ (d i) (cont-rec (+ i 1))))))
   (cont-rec 0))
 
-;; golden ratio: 0.61803398875
-
 (cont-frac-rec (lambda (i) 1.0)
                (lambda (i) 1.0)
                11)
 ;; 0.6180555555555556
+;; golden ratio: 0.61803398875
 
 ;; Accuracy of 4 decimals: k = 11.
 
-;; b.
+;; b. If your `cont-frac` procedures generates a recursive process, write one
+;; that generates an iterative process. If it generates an iterative process,
+;; write one that generates a recursive process.
 
 (define (cont-frac-iter n d k)
   (define (cont-iter i a)
@@ -1236,7 +1267,14 @@ x-power-x ;; 4.555532270803653
                 11)
 ;; 0.6180555555555556
 
-;; Exercise 1.38
+;; ##### Exercise 1.38
+
+;; In 1737, the Swiss mathematician Leonhard Euler published a memoir *De
+;; Fractionibus Continuis*, which included a continued fraction expansion for *e
+;; - 2*, where *e* is the base of the natural logarithms. In this fraction, the
+;; *N_i* are all 1, and the *D_i* are successively 1, 2, 1, 1, 4, 1, 1, 6, 1,
+;; 1, 8, ... Write a program that uses your `cont-frac` procedure from Exercise
+;; 1.37 to approximate *e*, based on Euler's expansion.
 
 (define (nat-log-series i)
   (cond ((= i 0) 1)
@@ -1255,10 +1293,24 @@ x-power-x ;; 4.555532270803653
 euler-e-frac
 ;; 2.7182817182817183
 
-;; Exercise 1.39
+;; ##### Exercise 1.39
+
+;; A continued fraction representation of the tangent function was published in
+;; 1770 by the German mathematician J.H. Lambert:
+
+;;                    x
+;;    tan x = ------------------
+;;                      x^2
+;;            1 - --------------
+;;                       x^2
+;;                3 - ----------
+;;                     5 - ...
+
+;; where *x* is in radians. Define a procedure `(tan-cf x k)` that computes an
+;; approximation to the tangent function based on Lambert's formula. `k`
+;; specifies the number of terms to compute, as in Exercise 1.37.
 
 ;; tan x = (/ x (- 1 (/ (square x) (- 3 (square x) (/ -5 ...)))))
-
 (define (tan-cf x k)
   (cont-frac-rec (lambda (i) (if (= i 0)
                             (+ x 0.0)
@@ -1283,7 +1335,8 @@ euler-e-frac
 ;; 1.4142135623746899
 
 (define (cube-roots x)
-  (fixed-point (average-damp (lambda (y) (/ x (square y)))) 1.0))
+  (fixed-point (average-damp (lambda (y) (/ x (square y))))
+               1.0))
 
 (cube-roots 27)
 ;; 2.9999972321057697
@@ -1327,7 +1380,7 @@ euler-e-frac
   (fixed-point-of-transform
    (lambda (y) (- (square y) x)) newton-transform 1.0))
 
-;; Exercise 1.40
+;; ##### Exercise 1.40
 
 (define (cubic a b c)
   (lambda (x) (+ (cube x) (* a (square x)) (* b x) c)))
