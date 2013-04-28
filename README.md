@@ -13,7 +13,7 @@ readability of the code solutions.
 
 - **Author:** Peter Urbak
 - **Created:** 2013-01-11
-- **Version:** 2013-04-08
+- **Version:** 2013-04-28
 - **URL:** https://github.com/dragonwasrobot/sicp-exercises
 
 ## To-do
@@ -39,4 +39,5 @@ readability of the code solutions.
   - Exercise 1.32
   - Exercise 1.33
 - Chapter 2+
-  - Everything
+  - Exercise 2.09
+  - Exercise 2.11+
