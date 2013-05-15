@@ -468,33 +468,33 @@ one-through-four ;; '(1 2 3 4)
 ;; #### List operations
 
 (define (list-ref items n)
-	(if (= n 0)
-			(car items)
-			(list-ref (cdr items) (- n 1))))
+  (if (= n 0)
+      (car items)
+      (list-ref (cdr items) (- n 1))))
 (define squares (list 1 4 9 16 25))
 (list-ref squares 3) ;; 16
 
 (define (length items)
-	(if (null? items)
-			0
-			(+ 1 (length (cdr items)))))
+  (if (null? items)
+      0
+      (+ 1 (length (cdr items)))))
 (define odds (list 1 3 5 7))
 (length odds) ;; 4
 
 (define (length items)
-	(define (length-iter a count)
-		(if (null? a)
-				count
-				(length-iter (cdr a) (+ 1 count))))
-	(length-iter items 0))
+  (define (length-iter a count)
+    (if (null? a)
+        count
+        (length-iter (cdr a) (+ 1 count))))
+  (length-iter items 0))
 
 (append squares odds) ;; '(1 4 9 16 25 1 3 5 7)
 (append odds squares) ;; '(1 3 5 7 1 4 9 16 25)
 
 (define (append list1 list2)
-	(if (null? list1)
-			list2
-			(cons (car list1) (append (cdr list1) list2))))
+  (if (null? list1)
+      list2
+      (cons (car list1) (append (cdr list1) list2))))
 
 ;; ##### Exercise 2.17
 
@@ -502,9 +502,9 @@ one-through-four ;; '(1 2 3 4)
 ;; last element of a given (nonempty) list:
 
 (define (last-pair lst)
-	(if (null? (cdr lst))
-			(list (car lst))
-			(last-pair (cdr lst))))
+  (if (null? (cdr lst))
+      (list (car lst))
+      (last-pair (cdr lst))))
 
 (last-pair (list 23 72 149 34)) ;; '(34)
 
@@ -514,9 +514,9 @@ one-through-four ;; '(1 2 3 4)
 ;; of the same elements in reverse order:
 
 (define (reverse lst)
-	(if (null? lst)
-			null
-			(append (reverse (cdr lst)) (list (car lst)))))
+  (if (null? lst)
+      null
+      (append (reverse (cdr lst)) (list (car lst)))))
 
 (reverse (list 1 4 9 16 25)) ;; '(25 16 9 4 1)
 
@@ -546,16 +546,16 @@ one-through-four ;; '(1 2 3 4)
 ;; follows:
 
 (define (cc amount coin-values)
-	(cond ((= amount 0) 1)
-				((or (< amount 0) (no-more? coin-values)) 0)
-				(else
-				 (+ (cc amount
-								(except-first-denomination
-								 coin-values))
-						(cc (- amount
-									 (first-denomination
-										coin-values))
-								coin-values)))))
+  (cond ((= amount 0) 1)
+        ((or (< amount 0) (no-more? coin-values)) 0)
+        (else
+         (+ (cc amount
+                (except-first-denomination
+                 coin-values))
+            (cc (- amount
+                   (first-denomination
+                    coin-values))
+                coin-values)))))
 
 ;; Define the procedures `first-denomination`, `except-first-denomination`, and
 ;; `no-more?` in terms of primitive operations on list structures. Does the
@@ -596,14 +596,14 @@ one-through-four ;; '(1 2 3 4)
 ;; parity as the first argument.
 
 (define (same-parity decider . numbers)
-	(letrec ((parity (modulo decider 2))
-					 (visit (lambda (numbers)
-										(if (null? numbers)
-												null
-												(if (= parity (modulo (car numbers) 2))
-														(cons (car numbers) (visit (cdr numbers)))
-														(visit (cdr numbers)))))))
-		(append (list decider) (visit numbers))))
+  (letrec ((parity (modulo decider 2))
+           (visit (lambda (numbers)
+                    (if (null? numbers)
+                        null
+                        (if (= parity (modulo (car numbers) 2))
+                            (cons (car numbers) (visit (cdr numbers)))
+                            (visit (cdr numbers)))))))
+    (append (list decider) (visit numbers))))
 
 (same-parity 1 2 3 4 5 6 7) ;; '(1 3 5 7)
 (same-parity 2 3 4 5 6 7) ;; '(2 4 6)
@@ -611,24 +611,24 @@ one-through-four ;; '(1 2 3 4)
 ;; #### Mapping over lists
 
 (define (scale-list items factor)
-	(if (null? items)
-			null
-			(cons (* (car items) factor)
-						(scale-list (cdr items)
-												factor))))
+  (if (null? items)
+      null
+      (cons (* (car items) factor)
+            (scale-list (cdr items)
+                        factor))))
 (scale-list (list 1 2 3 4 5) 10) ;; '(10 20 30 40 50)
 
 (define (map proc items)
-	(if (null? items)
-			null
-			(cons (proc (car items))
-						(map proc (cdr items)))))
+  (if (null? items)
+      null
+      (cons (proc (car items))
+            (map proc (cdr items)))))
 (map abs (list -10 2.5 -11.6 17)) ;; '(10 2.5 11.6 17)
 (map (lambda (x) (* x x)) (list 1 2 3 4)) ;; '(1 4 9 16)
 
 (define (scale-list items factor)
-	(map (lambda (x) (* x factor))
-			 items))
+  (map (lambda (x) (* x factor))
+       items))
 
 (scale-list (list 1 2 3 4 5) 10) ;; '(10 20 30 40 50)
 
@@ -645,14 +645,14 @@ one-through-four ;; '(1 2 3 4)
 (define (square x) (* x x))
 
 (define (square-list items)
-	(if (null? items)
-			null
-			(cons (square (car items))
-						(square-list (cdr items)))))
+  (if (null? items)
+      null
+      (cons (square (car items))
+            (square-list (cdr items)))))
 (square-list (list 1 2 3 4)) ;; '(1 4 9 16)
 
 (define (square-list items)
-	(map (lambda (x) (square x)) items))
+  (map (lambda (x) (square x)) items))
 (square-list (list 1 2 3 4)) ;; '(1 4 9 16)
 
 ;; ##### Exercise 2.22
@@ -661,13 +661,13 @@ one-through-four ;; '(1 2 3 4)
 ;; 2.21 so that it evolves an iterative process:
 
 (define (square-list items)
-	(define (iter things answer)
-		(if (null? things)
-				answer
-				(iter (cdr things)
-							(cons (square (car things))
-										answer))))
-	(iter items null))
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons (square (car things))
+                    answer))))
+  (iter items null))
 
 (square-list (list 1 2 3 4)) ;; '(16 9 4 1)
 
@@ -682,13 +682,13 @@ one-through-four ;; '(1 2 3 4)
 ;; Louis then tries to fix his bug by interchanging the arguments to `cons`:
 
 (define (square-list items)
-	(define (iter things answer)
-		(if (null? things)
-				answer
-				(iter (cdr things)
-							(cons answer
-										(square (car things))))))
-	(iter items null))
+  (define (iter things answer)
+    (if (null? things)
+        answer
+        (iter (cdr things)
+              (cons answer
+                    (square (car things))))))
+  (iter items null))
 
 (square-list (list 1 2 3 4)) ;; '((((() . 1) . 4) . 9) . 16)
 
@@ -707,9 +707,9 @@ one-through-four ;; '(1 2 3 4)
 ;; perform an action, such as printing. For example,
 
 (for-each (lambda (x)
-						(newline)
-						(display x))
-					(list 57 321 88))
+            (newline)
+            (display x))
+          (list 57 321 88))
 ;; 57
 ;; 321
 ;; 88
@@ -718,15 +718,15 @@ one-through-four ;; '(1 2 3 4)
 ;; something arbitrary, such as true. Give an implementation of `for-each`.
 
 (define (for-each proc items)
-	(if (null? items)
-			#t
-			(begin (proc (car items))
-						 (for-each proc (cdr items)))))
+  (if (null? items)
+      #t
+      (begin (proc (car items))
+             (for-each proc (cdr items)))))
 
 (for-each (lambda (x)
-						(newline)
-						(display x))
-					(list 57 321 88))
+            (newline)
+            (display x))
+          (list 57 321 88))
 ;; 57
 ;; 321
 ;; 88
