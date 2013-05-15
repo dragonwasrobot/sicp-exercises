@@ -9,11 +9,13 @@ Julie Sussman.
 Exercise descriptions from the book have been included in the source code for
 readability of the code solutions.
 
+The solutions have been written the Racket language.
+
 ## About
 
 - **Author:** Peter Urbak
 - **Created:** 2013-01-11
-- **Version:** 2013-04-28
+- **Version:** 2013-05-16
 - **URL:** https://github.com/dragonwasrobot/sicp-exercises
 
 ## To-do
@@ -40,4 +42,5 @@ readability of the code solutions.
   - Exercise 1.33
 - Chapter 2+
   - Exercise 2.09
-  - Exercise 2.11+
+  - Exercise 2.11
+  - Exercise 2.19
