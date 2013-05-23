@@ -44,3 +44,4 @@ The solutions have been written the Racket language.
   - Exercise 2.09
   - Exercise 2.11
   - Exercise 2.19
+  - Exercise 2.24 (partly)
