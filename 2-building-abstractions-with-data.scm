@@ -596,14 +596,14 @@ one-through-four ;; '(1 2 3 4)
 ;; parity as the first argument.
 
 (define (same-parity decider . numbers)
-	(let ((parity (modulo decider 2)))
-		(define (visit numbers)
-			(if (null? numbers)
-					null
-					(if (= parity (modulo (car numbers) 2))
-							(cons (car numbers) (visit (cdr numbers)))
-							(visit (cdr numbers)))))
-		(append (list decider) (visit numbers))))
+  (let ((parity (modulo decider 2)))
+    (define (visit numbers)
+      (if (null? numbers)
+          null
+          (if (= parity (modulo (car numbers) 2))
+              (cons (car numbers) (visit (cdr numbers)))
+              (visit (cdr numbers)))))
+    (append (list decider) (visit numbers))))
 
 (same-parity 1 2 3 4 5 6 7) ;; '(1 3 5 7)
 (same-parity 2 3 4 5 6 7) ;; '(2 4 6)
@@ -859,7 +859,7 @@ x ;; '((1 2) (3 4))
   (car (cdr branch)))
 
 (define (mobile? structure)
-	(pair? structure))
+  (pair? structure))
 
 (define my-mobile (make-mobile (make-branch 1 2) (make-branch 3 4)))
 (define fancy-mobile (make-mobile
@@ -878,14 +878,14 @@ x ;; '((1 2) (3 4))
 ;; total weight of a mobile.
 
 (define (branch-weight branch)
-	(let ((structure (branch-structure branch)))
-		(if (mobile? structure)
-				(total-weight structure)
-				structure)))
+  (let ((structure (branch-structure branch)))
+    (if (mobile? structure)
+        (total-weight structure)
+        structure)))
 
 (define (total-weight mobile)
-	(+ (branch-weight (left-branch mobile))
-		 (branch-weight (right-branch mobile))))
+  (+ (branch-weight (left-branch mobile))
+     (branch-weight (right-branch mobile))))
 
 (total-weight my-mobile) ;; 6
 (total-weight fancy-mobile) ;; 17
@@ -898,26 +898,26 @@ x ;; '((1 2) (3 4))
 ;; tests whether a binary mobile is balanced.
 
 (define (branch-balanced? branch)
-	(let ((structure (branch-structure branch)))
-		(if (mobile? structure)
-				(balanced? structure)
-				#t)))
+  (let ((structure (branch-structure branch)))
+    (if (mobile? structure)
+        (balanced? structure)
+        #t)))
 
 (branch-balanced? (make-branch 2 3)) ;; #t
 
 (define (branch-torque branch)
-	(* (branch-length branch)
-		 (branch-weight branch)))
+  (* (branch-length branch)
+     (branch-weight branch)))
 
 (branch-torque (make-branch 2 3)) ;; 6
 
 (define (balanced? mobile)
-	(let ((left (left-branch mobile))
-				(right (right-branch mobile)))
-		(and (= (branch-torque left)
-						(branch-torque right))
-				 (branch-balanced? left)
-				 (branch-balanced? right))))
+  (let ((left (left-branch mobile))
+        (right (right-branch mobile)))
+    (and (= (branch-torque left)
+            (branch-torque right))
+         (branch-balanced? left)
+         (branch-balanced? right))))
 
 (define my-mobile (make-mobile (make-branch 2 6) (make-branch 3 4)))
 (define fancy-mobile (make-mobile
@@ -956,7 +956,7 @@ x ;; '((1 2) (3 4))
   (cdr branch))
 
 (define (mobile? structure)
-	(pair? structure))
+  (pair? structure))
 
 (left-branch my-mobile) ;; '(2 . 6)
 (right-branch my-mobile) ;; '(3 . 4)
@@ -973,20 +973,20 @@ x ;; '((1 2) (3 4))
 ;; #### Mapping over trees
 
 (define (scale-tree tree factor)
-	(cond ((null? tree) null)
-				((not (pair? tree)) (* tree factor))
-				(else (cons (scale-tree (car tree) factor)
-										(scale-tree (cdr tree) factor)))))
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (* tree factor))
+        (else (cons (scale-tree (car tree) factor)
+                    (scale-tree (cdr tree) factor)))))
 
 (scale-tree (list 1 (list 2 (list 3 4) 5) (list 6 7)) 10)
 ;; '(10 (20 (30 40) 50) (60 70))
 
 (define (scale-tree tree factor)
-	(map (lambda (sub-tree)
-				 (if (pair? sub-tree)
-						 (scale-tree sub-tree factor)
-						 (* sub-tree factor)))
-			 tree))
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (scale-tree sub-tree factor)
+             (* sub-tree factor)))
+       tree))
 
 (scale-tree (list 1 (list 2 (list 3 4) 5) (list 6 7)) 10)
 ;; '(10 (20 (30 40) 50) (60 70))
@@ -1006,20 +1006,20 @@ x ;; '((1 2) (3 4))
 ;; procedures) and also by using map and recursion.
 
 (define (square-tree tree)
-	(cond ((null? tree) null)
-				((not (pair? tree)) (square tree))
-				(else (cons (square-tree (car tree))
-										(square-tree (cdr tree))))))
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (square tree))
+        (else (cons (square-tree (car tree))
+                    (square-tree (cdr tree))))))
 
 (square-tree (list 1 (list 2 (list 3 4) 5) (list 6 7)))
 ;; '(1 (4 (9 16) 25) (36 49))
 
 (define (square-tree tree)
-	(map (lambda (sub-tree)
-				 (if (pair? sub-tree)
-						 (square-tree sub-tree)
-						 (square sub-tree)))
-			 tree))
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (square-tree sub-tree)
+             (square sub-tree)))
+       tree))
 
 (square-tree (list 1 (list 2 (list 3 4) 5) (list 6 7)))
 ;; '(1 (4 (9 16) 25) (36 49))
@@ -1032,11 +1032,11 @@ x ;; '((1 2) (3 4))
 ;;    (define (square-tree tree) (tree-map square tree))
 
 (define (tree-map fun tree)
-	(map (lambda (sub-tree)
-				 (if (pair? sub-tree)
-						 (tree-map fun sub-tree)
-						 (fun sub-tree)))
-			 tree))
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (tree-map fun sub-tree)
+             (fun sub-tree)))
+       tree))
 
 (define (square-tree tree) (tree-map square tree))
 
@@ -1052,13 +1052,13 @@ x ;; '((1 2) (3 4))
 ;; set of subsets of a set and give a clear explanation of why it works:
 
 (define (subsets s)
-	(if (null? s)
-			(list null)
-			(let ((rest (subsets (cdr s))))
-				(append rest (map
-											(lambda (element)
-												(cons (car s) element))
-											rest)))))
+  (if (null? s)
+      (list null)
+      (let ((rest (subsets (cdr s))))
+        (append rest (map
+                      (lambda (element)
+                        (cons (car s) element))
+                      rest)))))
 
 (subsets (list 1 2 3))
 ;; '(() (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))
