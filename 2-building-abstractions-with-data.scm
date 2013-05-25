@@ -1064,3 +1064,330 @@ x ;; '((1 2) (3 4))
 ;; '(() (3) (2) (2 3) (1) (1 3) (1 2) (1 2 3))
 
 ;; ### 2.2.3 Sequences as Conventional Interfaces
+
+(define (sum-odd-squares tree)
+  (cond ((null? tree) 0)
+        ((not (pair? tree))
+         (if (odd? tree)
+             (square tree)
+             0))
+        (else (+ (sum-odd-squares (car tree))
+                 (sum-odd-squares (cdr tree))))))
+
+(define a-tree (list (list (list 1 2) (list 3 4)) (list (list 5 6) (list 7 8))))
+(sum-odd-squares a-tree) ;; 84 (+ 1 9 25 49)
+
+(define (fib n)
+  (cond ((= n 0) 0)
+        ((= n 1) 1)
+        (else (+ (fib (- n 1))
+                 (fib (- n 2))))))
+
+(define (even-fibs n)
+  (define (next k)
+    (if (> k n)
+        null
+        (let ((f (fib k)))
+          (if (even? f)
+              (cons f (next (+ k 1)))
+              (next (+ k 1))))))
+    (next 0))
+
+(even-fibs 10) ;; '(0 2 8 34)
+
+;; #### Sequence Operations
+
+(map square (list 1 2 3 4 5 )) ;; '(1 4 9 16 25)
+
+(define (filter predicate sequence)
+  (cond ((null? sequence)
+         null)
+        ((predicate (car sequence))
+         (cons (car sequence)
+               (filter predicate (cdr sequence))))
+        (else (filter predicate (cdr sequence)))))
+
+(filter odd? (list 1 2 3 4 5)) ;; '(1 3 5)
+
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+          (accumulate op initial (cdr sequence)))))
+
+(accumulate + 0 (list 1 2 3 4 5)) ;; 15
+(accumulate * 1 (list 1 2 3 4 5)) ;; 120
+(accumulate cons null (list 1 2 3 4 5)) ;; '(1 2 3 4 5)
+
+(define (enumerate-interval low high)
+  (if (> low high)
+      null
+      (cons low (enumerate-interval (+ low 1) high))))
+
+(enumerate-interval 2 7) ;; '(2 3 4 5 6 7)
+
+(define (enumerate-tree tree)
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (list tree))
+        (else (append (enumerate-tree (car tree))
+                      (enumerate-tree (cdr tree))))))
+
+(enumerate-tree (list 1 (list 2 (list 3 4)) 5)) ;; '(1 2 3 4 5)
+
+(define (sum-odd-squares tree)
+  (accumulate
+   + 0 (map square (filter odd? (enumerate-tree tree)))))
+
+(define a-tree (list (list (list 1 2) (list 3 4)) (list (list 5 6) (list 7 8))))
+(sum-odd-squares a-tree) ;; 84
+
+(define (even-fibs n)
+  (accumulate
+   cons null (filter even? (map fib (enumerate-interval 0 n)))))
+
+(even-fibs 10) ;; '(0 2 8 34)
+
+(define (list-fib-squares n)
+  (accumulate
+   cons null (map square (map fib (enumerate-interval 0 n)))))
+
+(list-fib-squares 10) ;; '(0 1 1 4 9 25 64 169 441 1156 3025)
+
+(define (product-of-squares-of-odd-elements sequence)
+  (accumulate * 1 (map square (filter odd? sequence))))
+
+(product-of-squares-of-odd-elements (list 1 2 3 4 5)) ;; 225 (* 1 9 25)
+
+;; (define (salary-of-highest-paid-programmer records)
+;;  (accumulate
+;;   max 0 (map salary (filter programmer? records))))
+
+;; ##### Exercise 2.33
+
+;; Fill in the missing expressions to complete the following definitions of
+;; some basic list-manipulation operations as accumulations:
+
+(define (map p sequence)
+  (accumulate (lambda (x y) (cons (p x) y)) null sequence))
+
+(map square (list 1 2 3 4 5)) ;; '(1 4 9 16 25)
+
+(define (append seq1 seq2)
+  (accumulate cons seq2 seq1))
+
+(append (list 1 2 3 4) (list 5 6 7)) ;; '(1 2 3 4 5 6 7)
+
+(define (length sequence)
+  (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
+
+(length (list 1 3 5 7 9)) ;; 5
+
+;; ##### Exercise 2.34
+
+;; Evaluating a polynomial in *x* at a given value of *x* can be formulated as
+;; an accumulation. We evaluate the polynomial
+
+;;    a_n*x^n + a_{n-1}*x^{n-1} + ... + a_1*x + a_0
+
+;; using a well-known algorithm called *Horner's rule*, which structures the
+;; computation as
+
+;;    (...(a_n*x + a_{n-1})*x + ... + a_1)*x + a_0.
+
+;; In other words, we start with *a_n*, multiply by *x*, add *a_{n−1}*, multiply
+;; by *x*, and so on, until we reach *a_0*.
+
+;; Fill in the following template to produce a procedure that evaluates a
+;; polynomial using Horner's rule. Assume that the coefficients of the
+;; polynomial are arranged in a sequence, from *a_0* through *a_n*.
+
+(define (horner-eval x coefficient-sequence)
+  (accumulate (lambda (this-coeff higher-terms)
+                (+ this-coeff (* higher-terms x)))
+              0
+              coefficient-sequence))
+
+;; For example, to compute *1 + 3x + 5x3 + x5 at x = 2* you would evaluate
+;; `(horner-eval 2 (list 1 3 0 5 0 1))`
+
+;; (+ (* (+ (* (+ (* (+ (* (+ (* 1 x) (* 0 x)) x) 5) x) 0) x) 3) x) 1)
+(horner-eval 2 (list 1 3 0 5 0 1)) ;; 79
+
+;; ##### Exercise 2.35
+
+;; Redefine `count-leaves` from Section 2.2.2 as an accumulation:
+
+(define (count-leaves t)
+  (accumulate +
+              0
+              (map (lambda (node)
+                     (if (not (pair? node))
+                         1
+                         (count-leaves node)))
+                   t)))
+
+(count-leaves a-tree) ;; 8
+
+;; ##### Exercise 2.36
+
+;; The procedure `accumulate-n` is similar to accumulate except that it takes as
+;; its third argument a sequence of sequences, which are all assumed to have the
+;; same number of elements. It applies the designated accumulation procedure to
+;; combine all the first elements of the sequences, all the second elements of
+;; the sequences, and so on, and returns a sequence of the results. For
+;; instance, if `s` is a sequence containing four sequences, `((1 2 3) (4 5 6)
+;; (7 8 9) (10 11 12))`, then the value of `(accumulate-n + 0 s)` should be the
+;; sequence `(22 26 30)`. Fill in the missing expressions in the following
+;; definition of `accumulate-n`:
+
+(define (accumulate-n op init seqs)
+  (if (null? (car seqs))
+      null
+      (cons (accumulate op init (map car seqs))
+            (accumulate-n op init (map cdr seqs)))))
+
+(define some-seqs '((1 2 3) (4 5 6) (7 8 9) (10 11 12)))
+(accumulate-n + 0 some-seqs) ;; '(22 26 30)
+
+;; ##### Exercise 2.37
+
+;; Suppose we represent vectors *v = (v_i)* as sequences of numbers, and
+;; matrices *m = (m_{ij})* as sequences of vectors (the rows of the matrix). For
+;; example, the matrix
+
+;; *(1 2 3 4)*
+;; *(4 5 6 6)*
+;; *(6 7 8 9)*
+
+;; is represented as the sequence *((1 2 3 4) (4 5 6 6) (6 7 8 9))*. With this
+;; representation, we can use sequence operations to concisely express the basic
+;; matrix and vector operations. These operations (which are described in any
+;; book on matrix algebra) are the following:
+
+;; `(dot-product v w)` returns the sum *\sum_i v_i w_i*,
+;; `(matrix-*-vector m w)` returns the vector *t*,
+;; where *t_i = \sum_j m_{ij} v_j
+;; `(matrix-*-matrix m n)` returns the matrix *p*,
+;; where *p_{ij} = \sum_k m_{ik} n_{kj}*,
+;; `(transpose m)` returns the matrix *n*, where *n_{ij} = m_{ji}*
+
+;; We can define the dot product as
+
+;; This guy uses the built in version of `map` which takes an arbitrary number
+;; of lists.
+(define (dot-product v w)
+  (accumulate + 0 (map * v w)))
+
+(dot-product '(1 2 3 4) '(5 6 7 8)) ;; 70
+;; (+ (* 1 5) (* 2 6) (* 3 7) (* 4 8))
+
+;; Fill in the missing expressions in the following procedures for computing
+;; the other matrix operations. (The procedure `accumulate-n` is defined in
+;; Exercise 2.36).
+
+(define a-matrix '((1 2 3 4) (4 5 6 6) (6 7 8 9)))
+(define a-vector '(4 3 2 1))
+
+;; A = (a b) , B = (x)
+;;     (c d)       (y)
+;;
+;; AB = (a b)(x) = (ax + by)
+;;      (c d)(y)   (cx + dy)
+
+(define (matrix-*-vector m v)
+  (map (lambda (w)
+         (accumulate + 0 (map * w v)))
+       m))
+
+;; (+ (* 1 4) (* 2 3) (* 3 2) (* 4 1)) = (20)
+;; (+ (* 4 4) (* 5 3) (* 6 2) (* 6 1)) = (49)
+;; (+ (* 6 4) (* 7 3) (* 8 2) (* 9 1)) = (70)
+(matrix-*-vector a-matrix a-vector) ;; '(20 49 70)
+
+;; (1 2 3 4)^T   (1 4 6)
+;; (4 5 6 6)   = (2 5 7)
+;; (6 7 8 9)     (3 6 8)
+;;               (4 6 9)
+
+(define (transpose mat)
+  (accumulate-n
+   cons
+   null
+   mat))
+
+(transpose a-matrix) ;; '((1 4 6) (2 5 7) (3 6 8) (4 6 9))
+
+;; (2 3 4) (0 1000)   (3 2340)
+;; (1 0 0) (1  100) = (0 1000)
+;;         (0   10)
+
+(define (matrix-*-matrix m n)
+  (let ((cols (transpose n)))
+    (map
+     (lambda (row)
+       (map (lambda (col) (accumulate +  0 (map * row col)))
+            cols))
+     m)))
+
+(define m1 '((2 3 4) (1 0 0)))
+(define m2 '((0 1000) (1 100) (0 10)))
+(transpose m2) ;; '((0 1 0) (1000 100 10))
+
+;; ( (+ (* 2 0) (* 3 1) (* 4 0)) (+ (* 2 1000) (* 3 100) (* 4 10)) )
+;; ( (+ (* 1 0) (* 0 1) (* 0 0)) (+ (* 1 1000) (* 0 100) (* 0 10)) )
+(matrix-*-matrix m1 m2) ;; '((3 2340) (0 1000))
+
+;; ##### Exercise 2.38
+
+;; The `accumulate` procedure is also known as `fold-right`, because it combines
+;; the first element of the sequence with the result of combining all the
+;; elements to the right. There is also a `fold-left`, which is similar to
+;; `fold-right`, except that it combines elements working in the opposite
+;; direction:
+
+(define (fold-right op initial sequence)
+  (if (null? sequence)
+      initial
+      (op (car sequence)
+          (fold-right op initial (cdr sequence)))))
+
+(define (fold-left op initial sequence)
+  (define (iter result rest)
+    (if (null? rest)
+        result
+        (iter (op result (car rest))
+              (cdr rest))))
+  (iter initial sequence))
+
+;; What are the values of
+
+(fold-right / 1 (list 1 2 3)) ;; 3/2
+(fold-left / 1 (list 1 2 3)) ;; 1/6
+(fold-right list null (list 1 2 3)) ;; '(1 (2 (3 ())))
+(fold-left list null (list 1 2 3)) ;; '(((() 1) 2) 3)
+
+;; Give a property that `op` should satisfy to guarantee that `fold-right` and
+;; `fold-left` will produce the same values for any sequence.
+
+;; `op` should be commutative, i.e. (= (op a b) (op b a))
+
+(fold-right + 0 (list 1 2 3)) ;; 6
+(fold-left + 0 (list 1 2 3)) ;; 6
+(= (fold-right + 0 (list 1 2 3)) (fold-left + 0 (list 1 2 3))) ;; #t
+
+;; ##### Exercise 2.39
+
+;; Complete the following definitions of `reverse` (Exercise 2.18) in terms of
+;; `fold-right` and `fold-left` from Exercise 2.38:
+
+(define (reverse sequence)
+  (fold-right (lambda (x y) (append y (list x))) null sequence))
+
+(reverse '(1 2 3 4 5)) ;; '(5 4 3 2 1)
+
+(define (reverse sequence)
+  (fold-left (lambda (x y) (append (list y) x)) null sequence))
+
+(reverse '(1 2 3 4 5)) ;; '(5 4 3 2 1)
+
+;; #### Nested Mappings
