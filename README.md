@@ -15,7 +15,7 @@ The solutions have been written the Racket language.
 
 - **Author:** Peter Urbak
 - **Created:** 2013-01-11
-- **Version:** 2013-05-16
+- **Version:** 2013-05-25
 - **URL:** https://github.com/dragonwasrobot/sicp-exercises
 
 ## To-do
@@ -45,3 +45,4 @@ The solutions have been written the Racket language.
   - Exercise 2.11
   - Exercise 2.19
   - Exercise 2.24 (partly)
+  - Exercise 2.40+
