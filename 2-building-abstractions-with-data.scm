@@ -643,7 +643,11 @@ one-through-four ;; '(1 2 3 4)
 ;; Here are two different definitions of `square-list`. Complete both of them by
 ;; filling in the missing expressions:
 
+;; Borrowed function - start (`1-building-abstractions-with-procedures.scm`)
+
 (define (square x) (* x x))
+
+;; Borrowed function - stop
 
 (define (square-list items)
   (if (null? items)
@@ -1386,8 +1390,128 @@ x ;; '((1 2) (3 4))
 (reverse '(1 2 3 4 5)) ;; '(5 4 3 2 1)
 
 (define (reverse sequence)
-  (fold-left (lambda (x y) (append (list y) x)) null sequence))
+  (fold-left (lambda (x y) (cons y x)) null sequence))
 
 (reverse '(1 2 3 4 5)) ;; '(5 4 3 2 1)
 
 ;; #### Nested Mappings
+
+;;    (accumulate
+;;     append null (map (lambda (i)
+;;                      (map (lambda (j) (list i j))
+;;                           (enumerate-interval 1 (- i 1))))
+;;                    (enumerate-interval 1 n)))
+
+(define (flatmap proc seq)
+  (accumulate append null (map proc seq)))
+
+;; Borrowed functions - start (`1-building-abstractions-with-procedures.scm`)
+
+(define (divides? a b) (= (remainder b a) 0))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1)))))
+
+(define (smallest-divisor n)
+  (find-divisor n 2))
+
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+;; Borrowed functions - stop
+
+(define (prime-sum? pair)
+  (prime? (+ (car pair) (cadr pair))))
+
+(define (make-pair-sum pair)
+  (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
+
+(define (prime-sum-pairs n)
+  (map make-pair-sum
+       (filter prime-sum?
+               (flatmap
+                (lambda (i)
+                  (map (lambda (j) (list i j))
+                       (enumerate-interval 1 (- i 1))))
+                (enumerate-interval 1 n)))))
+
+(prime-sum-pairs 6)
+;; '((2 1 3) (3 2 5) (4 1 5) (4 3 7) (5 2 7) (6 1 7) (6 5 11))
+
+(define (permutations s)
+  (if (null? s)        ; empty set?
+      (list null)      ; sequence containing empty set
+      (flatmap (lambda (x)
+                 (map (lambda (p) (cons x p))
+                      (permutations (remove x s))))
+               s)))
+
+(define (remove item sequence)
+  (filter (lambda (x) (not (= x item)))
+          sequence))
+
+(permutations '(1 2 3))
+;; '((1 2 3) (1 3 2) (2 1 3) (2 3 1) (3 1 2) (3 2 1))
+
+;; ##### Exercise 2.40
+
+;; Define a procedure `unique-pairs` that, given an integer *n*, generates the
+;; sequence of pairs *(i, j)* with *1 <= j < i <= n*. Use `unique-pairs` to
+;; simplify the definition of `prime-sum-pairs` given above.
+
+(define (unique-pairs n)
+  (flatmap
+   (lambda (i)
+     (map (lambda (j) (list i j))
+          (enumerate-interval 1 (- i 1))))
+   (enumerate-interval 1 n)))
+
+(unique-pairs 5)
+;; '((2 1) (3 1) (3 2) (4 1) (4 2) (4 3) (5 1) (5 2) (5 3) (5 4))
+
+(define (prime-sum-pairs n)
+  (map make-pair-sum
+       (filter prime-sum?
+               (unique-pairs n))))
+
+(prime-sum-pairs 6)
+;; '((2 1 3) (3 2 5) (4 1 5) (4 3 7) (5 2 7) (6 1 7) (6 5 11))
+
+;; ##### Exercise 2.41
+
+;; Write a procedure to find all ordered triples of distinct positive integers
+;; *i*, *j*, and *k* less than or equal to a given integer *n* that sum to a
+;; given integer *s*.
+
+(define (sums-to? s lst)
+  (= s (accumulate + 0 lst)))
+
+(sums-to? '(1 2 3) 6) ;; #t
+(sums-to? '(1 42 3) 20) ;; #f
+
+(define (unique-triples n)
+  (flatmap
+   (lambda (i)
+     (flatmap (lambda (j)
+            (map (lambda (k) (list i j k))
+                 (enumerate-interval 1 (- j 1))))
+          (enumerate-interval 1 (- i 1))))
+   (enumerate-interval 1 n)))
+
+(unique-triples 5)
+
+;; '((3 2 1) (4 2 1) (4 3 1) (4 3 2) (5 2 1)
+;;   (5 3 1) (5 3 2) (5 4 1) (5 4 2) (5 4 3))
+
+(define (triples-sum-to? n s)
+  (filter (lambda (lst) (sums-to? s lst))
+          (unique-pairs n)))
+
+(triples-sum-to? 5 7) ;; '((4 3) (5 2))
+(triples-sum-to? 5 3) ;; '((2 1))
+
+;; ##### Exercise 2.42
+
+;; TODO
