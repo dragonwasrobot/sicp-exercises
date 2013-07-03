@@ -1673,3 +1673,214 @@ x ;; '((1 2) (3 4))
         (below painter (beside smaller smaller)))))
 
 ;; #### Higher-order operations
+
+(define (square-of-four tl tr bl br)
+  (lambda (painter)
+    (let ((top (beside (tl painter) (tr painter)))
+          (bottom (beside (bl painter) (br painter))))
+      (below bottom top))))
+
+(define (flipped-pairs painter)
+  (let ((combine4 (square-of-four identity flip-vert
+                                  identity flip-vert)))
+    (combine4 painter)))
+
+(define (square-limit painter n)
+  (let ((combine4 (square-of-four flip-horiz identity
+                                  rotate180 flip-vert)))
+    (combine4 (corner-split painter n))))
+
+;; ##### Exercise 2.45
+
+;; `Right-split` and `up-split` can be expressed as instances of a general
+;; splitting operation. Define a procedure `split` with the property that
+;; evaluating
+
+;;    (define right-split (split beside below))
+;;    (define up-split (split below beside))
+
+;; produces procedures `right-split` and `up-split` with the same behaviors as
+;; the ones already defined.
+
+(define (split op1 op2)
+  (let ((splitter
+         (lambda (painter n)
+           ((if (= n 0)
+                painter
+                (let ((smaller (splitter painter (- n 1))))
+                  (op1 painter (op2 smaller smaller))))))))
+    (splitter op1 op2)))
+
+;; #### Frames
+
+(define (frame-coord-map frame)
+  (lambda (v)
+    (add-vect
+     (origin-frame frame)
+     (add-vect (scale-vect (xcor-vect v)
+                           (edge1-frame frame))
+               (scale-vect (ycor-vect v)
+                           (edge2-frame frame))))))
+
+;;    ((frame-coord-map a-frame) (make-vect 0 0))
+;;    (origin-frame a-frame)
+
+;; ##### Exercise 2.46
+
+;; A two-dimensional vector **v** running from the origin to a point can be
+;; represented as a pair consisting of an *x*-coordinate and a
+;; *y*-coordinate. Implement a data abstraction for vectors by giving a
+;; constructor `make-vect` and corresponding selectors `xcor-vect` and
+;; `ycor-vect`. In terms of your selectors and constructor, implement procedures
+;; `add-vect`, `sub-vect`, and `scale-vect` that perform the operations vector
+;; addition, vector subtraction, and multiplying a vector by a scalar:
+
+;; (x1, y1) + (x2, y2) = (x1 + x2, y1 + y2),
+;; (x1, y1) - (x2, y2) = (x1 - x2, y1 - y2),
+;;          s * (x, y) = (sx, sy).
+
+(define (make-vect x y)
+  (cons x y))
+
+(define (xcor-vect v)
+  (car v))
+
+(define (ycor-vect v)
+  (cdr v))
+
+(define (add-vect v1 v2)
+  (make-vect (+ (xcor-vect v1) (xcor-vect v2))
+             (+ (ycor-vect v1) (ycor-vect v2))))
+
+(define (sub-vect v1 v2)
+  (make-vect (- (xcor-vect v1) (xcor-vect v2))
+             (- (ycor-vect v1) (ycor-vect v2))))
+
+(define (scale-vect v s)
+  (make-vect (* s (xcor-vect v))
+             (* s (ycor-vect v))))
+
+
+;; Tests
+(define v1 (make-vect 1 2))
+(define v2 (make-vect 3 4))
+(xcor-vect v1) ;; 1
+(ycor-vect v1) ;; 2
+(xcor-vect v2) ;; 3
+(ycor-vect v2) ;; 4
+
+(add-vect v1 v2) ;; '(4 . 6)
+(sub-vect v1 v2) ;; '(-2 . -2)
+(scale-vect v1 4) ;; '(4 . 8)
+(scale-vect v2 3) ;; '(9. 12)
+
+;; ##### Exercise 2.47
+
+;; Here are two possible constructors for frames:
+
+(define (make-frame origin edge1 edge2)
+  (list origin edge1 edge2))
+
+(define (make-frame origin edge1 edeg2)
+  (cons origin (cons edge1 edge2)))
+
+;; For each constructor supply the appropriate selectors to produce an
+;; implementation for frames.
+
+;; Selectors for the list-based constructor
+
+(define (make-frame origin edge1 edge2)
+  (list origin edge1 edge2))
+
+(define (origin-frame frame)
+  (car frame))
+
+(define (edge1-frame frame)
+  (cadr frame))
+
+(define (edge2-frame frame)
+  (caddr frame))
+
+(define f1 (make-frame (make-vect 0.0 1.0)
+                       (make-vect 1.0 1.0)
+                       (make-vect 0.0 0.0)))
+
+(origin-frame f1) ;; '(0.0 . 1.0)
+(edge1-frame f1) ;; '(1.0 . 1.0)
+(edge2-frame f1) ;; '(0.0 . 0.0)
+
+;; Selectors for the cons-based constructor
+
+(define (make-frame origin edge1 edeg2)
+  (cons origin (cons edge1 edge2)))
+
+(define (origin-frame frame)
+  (car frame))
+
+(define (edge1-frame frame)
+  (cadr frame))
+
+(define (edge2-frame frame)
+  (cddr frame))
+
+(define f1 (make-frame (make-vect 0.0 1.0)
+                       (make-vect 1.0 1.0)
+                       (make-vect 0.0 0.0)))
+
+(origin-frame f1) ;; '(0.0 . 1.0)
+(edge1-frame f1) ;; '(1.0 . 1.0)
+(edge2-frame f1) ;; '(0.0 . 0.0)
+
+;; #### Painters
+
+(define (segments->painter segment-list)
+  (lambda (frame)
+    (for-each
+     (lambda (segment)
+       (draw-line
+        ((frame-coord-map frame)
+         (start-segment segment))
+        ((frame-coord-map frame)
+         (end-segment segment))))
+     segment-list)))
+
+;; ##### Exercise 2.48
+
+;; A directed line segment in the plane can be represented as a pair of vectors
+;; — the vector running from the origin to the start-point of the segment, and
+;; the vector running from the origin to the end-point of the segment. Use your
+;; vector representation from Exercise 2.46 to define a representation for
+;; segments with a constructor make-segment and selectors start-segment and
+;; end-segment.
+
+(define (make-segment v1 v2)
+  (cons v1 v2))
+
+(define (start-segment segment)
+  (car segment))
+
+(define (end-segment segment)
+  (cdr segment))
+
+(define v1 (make-vect 1 2))
+(define v2 (make-vect 3 4))
+(define seg (make-segment v1 v2))
+
+(start-segment seg) ;; '(1 . 2)
+(end-segment seg) ;; '(3 . 4)
+
+;; ##### Exercise 2.49
+
+;; Use `segments->painter` to define the following primitive painters:
+
+;; a. The painter that draws the outline of the designated frame.
+
+;; b. The painter that draws an "X" by connecting opposite corners of the
+;;    frame.
+
+;; c. The painter that draws a diamond shape by connecting the midpoints of the
+;; sides of the frame.
+
+;; d. The wave painter.
+
+;; TODO
