@@ -1811,7 +1811,7 @@ x ;; '((1 2) (3 4))
 
 ;; Selectors for the cons-based constructor
 
-(define (make-frame origin edge1 edeg2)
+(define (make-frame origin edge1 edge2)
   (cons origin (cons edge1 edge2)))
 
 (define (origin-frame frame)
@@ -1875,12 +1875,131 @@ x ;; '((1 2) (3 4))
 
 ;; a. The painter that draws the outline of the designated frame.
 
+(define (outline-painter frame)
+  (let ((s1 (make-segment (origin-frame frame)
+                          (edge1-frame frame)))
+        (s2 (make-segment (origin-frame frame)
+                          (edge2-frame frame)))
+        (s3 (make-segment (edge1-frame frame)
+                          (add-vector (edge1-frame frame)
+                                      (edge2-frame frame))))
+        (s4 (make-segment (edge2-frame frame)
+                          (add-vector (edge1-frame frame)
+                                      (edge2-frame frame)))))
+    ((segments->painter (list s1 s2 s3 s4)) frame)))
+
 ;; b. The painter that draws an "X" by connecting opposite corners of the
 ;;    frame.
+
+(define (outline-painter frame)
+  (let ((s1 (make-segment (edge1-frame frame)
+                          (edge2-frame frame)))
+        (s2 (make-segment (origin-frame frame)
+                          (add-vector (edge1-frame frame)
+                                      (edge2-frame frame)))))
+    ((segments->painter (list s1 s2)) frame)))
 
 ;; c. The painter that draws a diamond shape by connecting the midpoints of the
 ;; sides of the frame.
 
+;; TODO
+
 ;; d. The wave painter.
 
 ;; TODO
+
+;; #### Transforming and Combining Painters
+
+(define (transform-painter painter orgin corner1 corner2)
+  (lambda (frame)
+    (let ((m (frame-coord-map frame)))
+      (let ((new-origin (m origin)))
+        (painter (make-frame
+                  new-origin
+                  (sub-vect (m corner1) new-origin)
+                  (sub-vect (m corner2) new-origin)))))))
+
+(define (flip-vert painter)
+  (transform-painter painter
+                     (make-vect 0.0 1.0) ; new origin
+                     (make-vect 1.0 1.0) ; new end of edge1
+                     (make-vect 0.0 0.0))) ; new end of edge2
+
+(define (shrink-to-upper-right painter)
+  (transform-painter
+   painter (make-vect 0.5 0.5)
+   (make-vect 1.0 0.5) (make-vect 0.5 1.0)))
+
+(define (rotate90 painter)
+  (transform-painter painter
+                     (make-vect 1.0 0.0)
+                     (make-vect 1.0 1.0)
+                     (make-vect 0.0 0.0)))
+
+(define (squah-inwards painter)
+  (transform-painter painter
+                     (make-vect 0.0 0.0)
+                     (make-vect 0.65 0.35)
+                     (make-vect 0.35 0.65)))
+
+(define (beside painter1 painter2)
+  (let ((split-point (make-vect 0.5 0.0)))
+    (let ((paint-left
+           (transform-painter
+            painter1
+            (make-vect 0.0 0.0)
+            split-point
+            (make-vect 0.0 1.0)))
+            (paint-right
+             (transform-painter
+              painter2
+              split-point
+              (make-vect 1.0 0.0)
+              (make-vect 0.5 1.0))))
+      (lambda (frame)
+        (paint-left frame)
+        (paint-right frame)))))
+
+;; ##### Exercise 2.50
+
+;; Define the transformation `flip-horiz`, which flips painters horizontally,
+;; and transformations that rotate painters counterclockwise by 180 degrees and
+;; 270 degrees.
+
+;; TODO
+
+;; ##### Exercise 2.51
+
+;; Define the below operation for painters. Below takes two painters as
+;; arguments. The resulting painter, given a frame, draws with the first painter
+;; in the bottom of the frame and with the second painter in the top. Define
+;; below in two different ways—first by writing a procedure that is analogous to
+;; the beside procedure given above, and again in terms of beside and suitable
+;; rotation operations
+
+;; TODO
+
+;; #### Levels of Language for Robust Design
+
+;; ##### Exercise 2.52
+
+;; Make changes to the square limit of `wave` shown in Figure 2.9 by working at
+;; each of the levels described above. In particular:
+
+;; a. Add some segments to the primitive `wave` painter of Exercise 2.49 (to add
+;; a smile, for example).
+
+;; TODO
+
+;; b. Change the pattern constructed by `corner-split` (for example, by using
+;; only one copy of the `up-split` and `right-split` images instead of two).
+
+;; TODO
+
+;; c. Modify the version of `square-limit` that uses `square-of-four` so as to
+;; assemble the corners in a different pattern. (For example, you might make the
+;; big Mr. Rogers look outward from each corner of the square.)
+
+;; TODO
+
+;; ## 2.3 Symbolic Data

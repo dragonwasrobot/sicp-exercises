@@ -16,5 +16,5 @@ This project is still work in progress.
 
 - **Author:** Peter Urbak
 - **Created:** 2013-01-11
-- **Version:** 2013-07-03
+- **Version:** 2013-07-24
 - **URL:** https://github.com/dragonwasrobot/sicp-exercises
