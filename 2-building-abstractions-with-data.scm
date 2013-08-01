@@ -2003,3 +2003,263 @@ x ;; '((1 2) (3 4))
 ;; TODO
 
 ;; ## 2.3 Symbolic Data
+
+;; ### 2.3.1 Quotation
+
+(define (fact n)
+  (if (= n 1)
+      1
+      (* n (fact (- n 1)))))
+
+(define a 1)
+(define b 2)
+(list a b) ;; '(1 2)
+(list 'a 'b) ;; '(a b)
+(list 'a b) ;; '(a 2)
+
+(car '(a b c)) ;; 'a
+(cdr '(a b c)) ;; '(b c)
+
+'()
+
+(define (memq item x)
+  (cond ((null? x) false)
+        ((eq? item (car x)) x)
+        (else (memq item (cdr x)))))
+
+(memq 'apple '(pear banana prune)) ;; #f
+(memq 'apple '(x (apple sauce) y apple pear)) ;; '(apple pear)
+
+;; ##### Exercise 2.53
+
+;; What would the interpreter print in response to evaluating each of the
+;; following expressions?
+
+(list 'a 'b 'c) ;; '(a b c)
+(list (list george)) ;; error: reference to undefined identifier
+(cdr '((x1 x2) (y1 y2))) ;; '((y1 y2))
+(cadr '((x1 x2) (y1 y2))) ;; '(y1 y2)
+(pair? (car '(a short list))) ;; #f
+(memq 'red '((red shoes) (blue socks))) '' #f
+(memq 'red '(red shoes blue socks)) ;; '(red shoes blue socks)
+
+;; ##### Exercise 2.54
+
+;; Two lists are said to be equal? if they contain equal elements arranged in
+;; the same order. For example,
+
+(equal? '(this is a list) '(this is a list)) ;; #t
+(equal? '(this is a list) '(this (is a) list)) ;; #f
+
+(define (my-equal? o1 o2)
+  (cond
+   ((and (null? o1) (null? o2))
+    #t)
+   ((and (list? o1) (list? o2))
+    (and (my-equal? (car o1) (car o2))
+         (my-equal? (cdr o1) (cdr o2))))
+   (else (eq? o1 o2))))
+
+(my-equal? 'a 'a) ;; #t
+(my-equal? 'a 'b) ;; #f
+(my-equal? '() '()) ;; #t
+(my-equal? '() 'b) ;; #f
+(my-equal? 2 2) ;; #t
+(my-equal? 2 '2) ;; #t
+(my-equal? '(this is a list) '(this is a list)) ;; #t
+(my-equal? '(this is a list) '(this (is a) list)) ;; #f
+
+;; ##### Exercise 2.55
+
+;; Eva Lu Ator types to the interpreter the expression
+(car ”abracadabra)
+;; To her surprise, the interpreter prints back quote. Explain.
+
+;; If we mimic the interpreter and change the quote symbols to (quote) we get
+(car (quote (quote abracadabra)))
+;; and thus is becomes obvious that we are simply accessing the first element in
+;; a quoted list which is 'quote.
+
+;; ### 2.3.2 Example: Symbolic Differentiation
+
+;; #### The differentiation program with abstract data
+
+;; reduction rules:
+;; dc/dx = 0 for *c* a constant or a variable different from *x*,
+;; dx/dx = 1,
+;; d(u+v)/dx = du/dx + dv/dx,
+;; d(uv)/dx = u*(dv/dx) + v*(du/dx).
+
+;; We presume to have the following procedures
+;; (variable? e) ; Is *e* a variable?
+;; (same-variable? v1 v2) ; Are *v1* and *v2* the same variable?
+;; (sum? e) ; Is *e* a sum?
+;; (addend e) ; Addend of the sum *e*
+;; (augend e) ; Augend of the sum *e*
+;; (make-sum a1 a2) ; Construct the sum of *a1* and *a2*
+;; (product? e) ; Is *e* a product?
+;; (multiplier e) ; Multiplier of the product *e*
+;; (multiplicand e) ; Multiplicand of the product *e*
+;; (make-product m1 m2) ; Construct the product of *m1* and *m2*
+
+(define (deriv exp var)
+  (cond ((number? exp)
+         0)
+        ((variable? exp)
+         (if (same-variable? exp var)
+             1
+             0))
+        ((sum? exp)
+         (make-sum (deriv (addend exp) var)
+                   (deriv (augend exp) var)))
+        ((product? exp)
+         (make-sum
+          (make-product (multiplier exp)
+                        (deriv (multiplicand exp) var))
+          (make-product (deriv (multiplier exp) var)
+                        (multiplicand exp))))
+        (else
+         (error "unknown expression type: DERIV" exp))))
+
+;; #### Representing algebraic expressions
+
+;; We represent algebraic expressions like 'ax + b' using LISP's parenthesized
+;; prefix form '(+ (* a x) b)'.
+
+;; Variables are symbols.
+(define (variable? x) (symbol? x))
+
+;; Two variables are the same if the symbols representing them are `eq?`.
+(define (same-variable? v1 v2)
+  (and (variable? v1) (variable? v2) (eq? v1 v2)))
+
+;; Sums and products are constructed as lists.
+(define (make-sum a1 a2) (list '+ a1 a2))
+(define (make-product m1 m2) (list '* m1 m2))
+
+;; A sum is a list whose first element is the symbol `+`.
+(define (sum? x) (and (pair? x) (eq? (car x) '+)))
+
+;; The addend is the second item of the sum list.
+(define (addend s) (cadr s))
+
+;; The augend is the third item of the sum list.
+(define (augend s) (caddr s))
+
+;; A product is a list whose first element is the symbol '*'.
+(define (product? x) (and (pair? x) (eq? (car x) '*)))
+
+;; The multiplier is the second item of the product list.
+(define (multiplier p) (cadr p))
+
+;; The multiplicand is the third item of the product list.
+(define (multiplicand p) (caddr p))
+
+;; Examples
+(deriv '(+ x 3) 'x) ;; '(+ 1 0)
+(deriv '(* x y) 'x) ;; '(+ (* x 0) (* 1 y))
+(deriv '(* (* x y) (+ x 3)) 'x)
+;; '(+ (* (* x y) (+ 1 0))
+;;     (* (+ (* x 0) (* 1 y))
+;;        (+ x 3)))
+
+;; The above solutions are not the simplest possible, we have to be a bit more
+;; clever.
+(define (make-sum a1 a2)
+  (cond ((=number? a1 0)
+         a2)
+        ((=number? a2 0)
+         a1)
+        ((and (number? a1) (number? a2))
+         (+ a1 a2))
+        (else (list '+ a1 a2))))
+
+(define (=number? exp num)
+  (and (number? exp) (= exp num)))
+
+(define (make-product m1 m2)
+  (cond ((or (=number? m1 0) (=number? m2 0))
+         0)
+        ((=number? m1 1)
+         m2)
+        ((=number? m2 1)
+         m1)
+        ((and (number? m1) (number? m2))
+         (* m1 m2))
+        (else (list '* m1 m2))))
+
+(deriv '(+ x 3) 'x) ;; 1
+(deriv '(* x y) 'x) ;; 'y
+(deriv '(* (* x y) (+ x 3)) 'x) ;; '(+ (* x y) (* y (+ x 3)))
+
+;; ##### Exercise 2.56
+
+;; Show how to extend the basic differentiator to handle more kinds of
+;; expressions. For instance, implement the differentiation rule
+
+;; d(u^n)/dx = nu^{n-1}(du/dx)
+
+;; by adding a new clause to the `deriv` program and defining appropriate
+;; procedures `exponentiation?`, `base`, `exponent`, and
+;; `make-exponentiation`. (You may use the symbol ** to denote exponentiation.)
+;; Build in the rules that anything raised to the power 0 is 1 and anything
+;; raised to the power 1 is the thing itself.
+
+(define (deriv exp var)
+  (cond ((number? exp)
+         0)
+        ((variable? exp)
+         (if (same-variable? exp var)
+             1
+             0))
+        ((sum? exp)
+         (make-sum (deriv (addend exp) var)
+                   (deriv (augend exp) var)))
+        ((product? exp)
+         (make-sum
+          (make-product (multiplier exp)
+                        (deriv (multiplicand exp) var))
+          (make-product (deriv (multiplier exp) var)
+                        (multiplicand exp))))
+        ((exponentiation? exp)
+         (make-product
+          (make-product (exponent exp)
+                        (make-exponentiation (base exp)
+                                             (- (exponent exp) 1)))
+          (deriv (base exp) var)))
+        (else
+         (error "unknown expression type: DERIV" exp))))
+
+;; An exponentiation is a list whose first element is the symbol '**'.
+(define (exponentiation? x) (and (pair? x) (eq? (car x) '**)))
+
+;; The base is the second item of the exponentiation list.
+(define (base p) (cadr p))
+
+;; The exponent is the third item of the exponentiation list.
+(define (exponent p) (caddr p))
+
+(define (make-exponentiation e1 e2)
+  (cond ((=number? e2 0)
+         1)
+        ((=number? e2 1)
+         e1)
+        (else (list '** e1 e2))))
+
+(deriv '(** x 3) 'x) ;; '(* 3 (** x 2))
+(deriv '(** x 2) 'x) ;; '(* 2 x)
+(deriv '(** x 1) 'x) ;; 1
+(deriv '(** x 0) 'x) ;; 0
+
+;; ##### Exercise 2.57
+
+;; Extend the differentiation program to handle sums and products of arbitrary
+;; numbers of (two or more) terms. Then the last example above could be
+;; expressed as
+
+;;    (deriv '(* x y (+ x 3)) 'x)
+
+;; Try to do this by changing only the representation for sums and products,
+;; without changing the deriv procedure at all. For example, the `addend` of a
+;; sum would be the first term, and the `augend` would be the sum of the rest of
+;; the terms.
