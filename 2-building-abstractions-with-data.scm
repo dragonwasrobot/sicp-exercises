@@ -1,5 +1,8 @@
 ;; # 2 Building Abstractions with Data
 
+;; for all your tracing needs:
+;; http://docs.racket-lang.org/reference/debugging.html
+
 (define (linear-combination a b x y)
   (+ (* a x) (* b y)))
 
@@ -2146,7 +2149,7 @@ x ;; '((1 2) (3 4))
 ;; The augend is the third item of the sum list.
 (define (augend s) (caddr s))
 
-;; A product is a list whose first element is the symbol '*'.
+;; A product is a list whose first element is the symbol `*`.
 (define (product? x) (and (pair? x) (eq? (car x) '*)))
 
 ;; The multiplier is the second item of the product list.
@@ -2165,6 +2168,7 @@ x ;; '((1 2) (3 4))
 
 ;; The above solutions are not the simplest possible, we have to be a bit more
 ;; clever.
+
 (define (make-sum a1 a2)
   (cond ((=number? a1 0)
          a2)
@@ -2263,3 +2267,161 @@ x ;; '((1 2) (3 4))
 ;; without changing the deriv procedure at all. For example, the `addend` of a
 ;; sum would be the first term, and the `augend` would be the sum of the rest of
 ;; the terms.
+
+;; The addend is the second item of the sum list.
+(define (addend s) (cadr s))
+
+;; The augend is the tail of the sum list starting from the third item.
+(define (augend s)
+  (if (empty? (cddr s))
+      0
+      (cons '+ (cddr s))))
+
+;; The multiplier is the second item of the product list.
+(define (multiplier p) (cadr p))
+
+;; The multiplicand is the tail of the product list starting from the third
+;; item.
+(define (multiplicand p)
+  (if (empty? (cddr p))
+      1
+      (cons '* (cddr p))))
+
+;; Test
+(deriv '(* x y (+ x 3)) 'x) ;; '(+ (* x y) (* y (+ x 3)))
+(deriv '(* (* x y) (+ x 3)) 'x) ;; '(+ (* x y) (* y (+ x 3)))
+
+;; ##### Exercise 2.58
+
+;; Suppose we want to modify the differentiation program so that it works with
+;; ordinary mathematical notation, in which `+` and `*` are infix rather than
+;; prefix operators. Since the differentiation program is defined in terms of
+;; abstract data, we can modify it to work with different representations of
+;; expressions solely by changing the predicates, selectors, and constructors
+;; that define the representation of the algebraic expressions on which the
+;; differentiator is to operate.
+
+;; a. Show how to do this in order to differentiate algebraic expressions
+;; presented in infix form, such as `(x + (3 * (x + (y + 2))))`. To simplify the
+;; task, assume that `+` and `*` always take two arguments and that expressions
+;; are fully parenthesized.
+
+;; predicates
+
+;; A sum is a list whose first element is the symbol `+`.
+(define (sum? x) (and (pair? x) (eq? (cadr x) '+)))
+
+;; A product is a list whose first element is the symbol `*`.
+(define (product? x) (and (pair? x) (eq? (cadr x) '*)))
+
+;; selectors
+
+;; The addend is the second item of the sum list.
+(define (addend s) (car s))
+
+;; The augend is the third item of the sum list.
+(define (augend s) (caddr s))
+
+;; The multiplier is the second item of the product list.
+(define (multiplier p) (car p))
+
+;; The multiplicand is the third item of the product list.
+(define (multiplicand p) (caddr p))
+
+;; constructors
+
+(define (make-sum a1 a2)
+  (cond ((=number? a1 0)
+         a2)
+        ((=number? a2 0)
+         a1)
+        ((and (number? a1) (number? a2))
+         (+ a1 a2))
+        (else (list a1 '+ a2))))
+
+(define (make-product m1 m2)
+  (cond ((or (=number? m1 0) (=number? m2 0))
+         0)
+        ((=number? m1 1)
+         m2)
+        ((=number? m2 1)
+         m1)
+        ((and (number? m1) (number? m2))
+         (* m1 m2))
+        (else (list m1 '* m2))))
+
+;; Tests
+
+(deriv '(x + (3 * (x + (y + 2)))) 'x) ; 4
+(deriv '(x + (3 * (x + (y + 2)))) 'y) ; 3
+
+;; b. The problem becomes substantially harder if we allow standard algebraic
+;; notation, such as `(x + 3 * (x + y + 2))`, which drops unnecessary
+;; parentheses and assumes that multiplication is done before addition. Can
+;; you design appropriate predicates, selectors, and constructors for this
+;; notation such that our derivative program still works?
+
+;; predicates
+
+;; A sum is a list whose first element is the symbol `+`.
+(define (sum? x)
+  (and (pair? x)
+       (not (null? (cdr x)))
+       (eq? (cadr x) '+)))
+
+;; A product is a list whose first element is the symbol `*`.
+(define (product? x)
+  (and (pair? x)
+       (not (null? (cdr x)))
+       (eq? (cadr x) '*)))
+
+;; selectors
+
+;; The addend is the second item of the sum list.
+(define (addend s) (car s))
+
+;; The augend is the third item of the sum list.
+(define (augend s)
+  (let ((ae (cddr s)))
+    (if (= (length ae) 1)
+        (car ae)
+        ae)))
+
+;; The multiplier is the second item of the product list.
+(define (multiplier p) (car p))
+
+;; The multiplicand is the third item of the product list.
+(define (multiplicand p)
+  (let ((mc (cddr p)))
+    (if (= (length mc) 1)
+        (car mc)
+        mc)))
+
+;; constructors
+
+(define (make-sum a1 a2)
+  (cond ((=number? a1 0)
+         a2)
+        ((=number? a2 0)
+         a1)
+        ((and (number? a1) (number? a2))
+         (+ a1 a2))
+        (else (list a1 '+ a2))))
+
+(define (make-product m1 m2)
+  (cond ((or (=number? m1 0) (=number? m2 0))
+         0)
+        ((=number? m1 1)
+         m2)
+        ((=number? m2 1)
+         m1)
+        ((and (number? m1) (number? m2))
+         (* m1 m2))
+        (else (list m1 '* m2))))
+
+;; Tests
+
+(deriv '(x + 3 * (x + y + 2)) 'x) ;; 4
+(deriv '(x + 3 * (x + y + 2)) 'y) ;; 3
+
+;; ### 2.3.3 Example: Representing Sets
