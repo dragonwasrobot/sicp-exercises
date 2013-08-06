@@ -2423,5 +2423,91 @@ x ;; '((1 2) (3 4))
 
 (deriv '(x + 3 * (x + y + 2)) 'x) ;; 4
 (deriv '(x + 3 * (x + y + 2)) 'y) ;; 3
+(deriv '(x + (2 * y + 3) * (x + y + 2)) 'y)
+;; '((2 * y + 3) + (2 * (x + y + 2)))
 
 ;; ### 2.3.3 Example: Representing Sets
+
+;; #### Sets as unordered lists
+
+(define (element-of-set? x set)
+  (cond ((null? set)
+         #f)
+        ((equal? x (car set))
+         #t)
+        (else
+         (element-of-set? x (cdr set)))))
+
+(define (adjoin-set x set)
+  (if (element-of-set? x set)
+      set
+      (cons x set)))
+
+(define (intersection-set set1 set2)
+  (cond ((or (null? set1) (null? set2))
+        '())
+        ((element-of-set? (car set1) set2)
+         (cons (car set1)
+               (intersection-set (cdr set1) set2)))
+        (else
+         (intersection-set (cdr set1) set2))))
+
+;; ##### Exercise 2.59
+
+;; Implement the `union-set` operation for the unordered-list representation of
+;; sets.
+
+(define (union-set set1 set2)
+  (cond ((null? set1)
+         set2)
+        ((not (element-of-set? (car set1) set2))
+         (cons (car set1)
+               (union-set (cdr set1) set2)))
+        (else
+         (union-set (cdr set1) set2))))
+
+;; ##### Exercise 2.60
+
+;; We specified that a set would be represented as a list with no
+;; duplicates. Now suppose we allow duplicates. For instance, the set {1,2,3}
+;; could be represented as the list (2 3 2 1 3 2 2). Design procedures
+;; `element-of-set?`, `adjoin-set`, `union-set`, and `intersection-set` that
+;; operate on this representation. How does the efficiency of each compare with
+;; the corresponding procedure for the non-duplicate representation? Are there
+;; applications for which you would use this representation in preference to the
+;; non-duplicate one?
+
+(define (element-of-set? x set)
+  (cond ((null? set)
+         #f)
+        ((equal? x (car set))
+         #t)
+        (else
+         (element-of-set? x (cdr set)))))
+;; Poorer performance, since we don't gain anything from allowing duplicates
+;; other than having to compare values we seen before with x.
+
+(define (adjoin-set x set)
+  (cons x set))
+;; Now takes constant time since we can simply add the new element without
+;; blinking.
+
+(define (intersection-set set1 set2)
+  (cond ((or (null? set1) (null? set2))
+         '())
+        ((element-of-set? (car set1) set2)
+         (cons (car set1)
+               (intersection-set (cdr set1) set2)))
+        (else
+         (intersection-set (cdr set1) set2))))
+;; Poorer performance, as we can't avoid going through all the duplicates
+;; similar to the `element-of-set?` case.
+
+(define (union-set set1 set2)
+  (append set1 set2))
+;; Now takes constant time as we simply append set2 to set1.
+
+;; The above representation could be useful in contrived use cases where we
+;; mainly perform `adjoin-set` and `union-set` and very few lookups.
+
+;; #### Sets as ordered lists
