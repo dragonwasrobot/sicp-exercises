@@ -2756,6 +2756,13 @@ x ;; '((1 2) (3 4))
                       (cons x2 (list-union-set set1 (cdr set2)))))))))
     (list->tree (list-union-set list-set1 list-set2))))
 
+;; Performance analysis:
+;; - The `tree->list-2` procedure is *Theta(n)*
+;; - The `list-union-set` procedure is *Theta(n)*
+;; - The `list->tree` procedure is *Theta(n)*
+;; Thus we get: 2 * `tree->list-2` + `list-union-set` + `list-tree` =
+;; 2 * Theta(n) + Theta(n) + Theta(n) = 4 * Theta(n) = Theta(n)
+
 ;; Test
 (union-set (list->tree '(1 3 5 6 7 8 10))
            (list->tree '(1 2 3 4 8 9 10 11)))
@@ -2785,6 +2792,13 @@ x ;; '((1 2) (3 4))
                    (list-intersection-set set1 (cdr set2)))))))
     (list->tree (list-intersection-set list-set1 list-set2))))
 
+;; Performance analysis:
+;; - The `tree->list-2` procedure is *Theta(n)*
+;; - The `list-intersection-set` procedure is *Theta(n)*
+;; - The `list->tree` procedure is *Theta(n)*
+;; Thus we get: 2 * `tree->list-2` + `list-intersection-set` + `list-tree` =
+;; 2 * Theta(n) + Theta(n) + Theta(n) = 4 * Theta(n) = Theta(n)
+
 ;; Test
 (intersection-set (list->tree '(1 3 5 6 7 8 10))
                   (list->tree '(1 2 3 4 8 9 10 11)))
@@ -2793,4 +2807,4 @@ x ;; '((1 2) (3 4))
 ;;  3 ->  1 ,  8
 ;;  8 ->  / , 10
 
-;; #### Sets as information retrieval
+;; #### Sets and information retrieval
