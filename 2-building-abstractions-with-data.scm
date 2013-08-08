@@ -2511,3 +2511,286 @@ x ;; '((1 2) (3 4))
 ;; mainly perform `adjoin-set` and `union-set` and very few lookups.
 
 ;; #### Sets as ordered lists
+
+(define (element-of-set? x set)
+  (cond ((null? set)
+         #f)
+        ((= x (car set))
+         #t)
+        ((< x (car set))
+         #f)
+        (else (element-of-set? x (cdr set)))))
+
+(define (intersection-set set1 set2)
+  (if (or (null? set1) (null? set2))
+      '()
+      (let ((x1 (car set1))
+            (x2 (car set2)))
+        (cond ((= x1 x2)
+               (cons x1 (intersection-set (cdr set1) (cdr set2))))
+              ((< x1 x2)
+               (intersection-set (cdr set1) set2))
+              ((< x2 x1)
+               (intersection-set set1 (cdr set2)))))))
+
+;; ##### Exercise 2.61
+
+;; Give an implementation of `adjoin-set` using the ordered representation. By
+;; analogy with `element-of-set?` show how to take advantage of the ordering to
+;; produce a procedure that requires on the average about half as many steps as
+;; with the unordered representation.
+
+(define (adjoin-set x set)
+  (cond ((null? set)
+         (cons x '()))
+        ((= x (car set))
+         set)
+        ((< x (car set))
+         (cons x set))
+        ((< (car set) x)
+         (cons (car set) (adjoin-set x (cdr set))))))
+
+;; ##### Exercise 2.62
+
+;; Give a Theta(n) implementation of `union-set` for sets represented as ordered
+;; lists.
+
+(define (union-set set1 set2)
+  (cond ((null? set1)
+         set2)
+        ((null? set2)
+         set1)
+        (else
+         (let ((x1 (car set1))
+               (x2 (car set2)))
+           (cond ((= x1 x2)
+                  (cons x1 (union-set (cdr set1) (cdr set2))))
+                 ((< x1 x2)
+                  (cons x1 (union-set (cdr set1) set2)))
+                 ((< x2 x1)
+                  (cons x2 (union-set set1 (cdr set2)))))))))
+
+;; The implementation runs in Theta(n) time because remove at least one element from
+;; `set1` or `set2` for each recursive step.
+
+;; #### Sets as binary trees
+
+(define (entry tree) (car tree))
+(define (left-branch tree) (cadr tree))
+(define (right-branch tree) (caddr tree))
+(define (make-tree entry left right) (list entry left right))
+
+(define (element-of-set? x set)
+  (cond ((null? set)
+         #f)
+        ((= x (entry set))
+         #t)
+        ((< x (entry set))
+         (element-of-set?  x (left-branch set)))
+        ((> x (entry set))
+         (element-of-set?  x (right-branch set)))))
+
+(define (adjoin-set x set)
+  (cond ((null? set)
+         (make-tree x '() '()))
+        ((= x (entry set))
+         set)
+        ((< x (entry set))
+         (make-tree (entry set)
+                    (adjoin-set x (left-branch set))
+                    (right-branch set)))
+        ((> x (entry set))
+         (make-tree (entry set)
+                    (left-branch set)
+                    (adjoin-set x (right-branch set))))))
+
+;; ##### Exercise 2.63
+
+;; Each of the following two procedures converts a binary tree to a list.
+
+(define (tree->list-1 tree)
+  (if (null? tree)
+      '()
+      (append (tree->list-1 (left-branch tree))
+              (cons (entry tree)
+                    (tree->list-1
+                     (right-branch tree))))))
+
+(define (tree->list-2 tree)
+  (define (copy-to-list tree result-list)
+    (if (null? tree)
+        result-list
+        (copy-to-list (left-branch tree)
+                      (cons (entry tree)
+                            (copy-to-list
+                             (right-branch tree)
+                             result-list)))))
+  (copy-to-list tree '()))
+
+;; a. Do the two procedures produce the same result for every tree? If not, how
+;; do the results differ? What lists do the two procedures produce for the trees
+;; in Figure 2.16?
+
+;; The two procedures produce the exact same result for all trees tested:
+
+(define tree-fig-216-1
+  (make-tree 7
+             (make-tree 3
+                        (make-tree 1 '() '())
+                        (make-tree 5 '() '()))
+             (make-tree 9
+                        '()
+                        (make-tree 11 '() '()))))
+
+(define tree-fig-216-2
+  (make-tree 3
+             (make-tree 1 '() '())
+             (make-tree 7
+                        (make-tree 5 '() '())
+                        (make-tree 9
+                                   '()
+                                   (make-tree 11 '() '())))))
+
+(define tree-fig-216-3
+  (make-tree 5
+             (make-tree 3
+                        (make-tree 1 '() '())
+                        '())
+             (make-tree 9
+                        (make-tree 7 '() '())
+                        (make-tree 11 '() '()))))
+
+(tree->list-1 tree-fig-216-1) ;; '(1 3 5 7 9 11)
+(tree->list-2 tree-fig-216-1) ;; '(1 3 5 7 9 11)
+
+(tree->list-1 tree-fig-216-2) ;; '(1 3 5 7 9 11)
+(tree->list-2 tree-fig-216-2) ;; '(1 3 5 7 9 11)
+
+(tree->list-1 tree-fig-216-3) ;; '(1 3 5 7 9 11)
+(tree->list-2 tree-fig-216-3) ;; '(1 3 5 7 9 11)
+
+;; b. Do the two procedures have the same order of growth in the number of steps
+;; required to convert a balanced tree with *n* elements to a list? If not,
+;; which one grows more slowly?
+
+;; `tree->list-1`: *O(n log n)*
+;; `tree->list-2`: *O(n)*.
+
+;; ##### Exercise 2.64
+
+(define (list->tree elements)
+  (car (partial-tree elements (length elements))))
+
+(define (partial-tree elts n)
+  (if (= n 0)
+      (cons '() elts)
+      (let ((left-size (quotient (- n 1) 2)))
+        (let ((left-result
+               (partial-tree elts left-size)))
+          (let ((left-tree (car left-result))
+                (non-left-elts (cdr left-result))
+                (right-size (- n (+ left-size 1))))
+            (let ((this-entry (car non-left-elts))
+                  (right-result
+                   (partial-tree
+                    (cdr non-left-elts)
+                    right-size)))
+              (let ((right-tree (car right-result))
+                    (remaining-elts
+                     (cdr right-result)))
+                (cons (make-tree this-entry
+                                 left-tree
+                                 right-tree)
+                      remaining-elts))))))))
+
+;; a. Write a short paragraph explaining as clearly as you can how
+;; `partial-tree` works. Draw the tree produced by `list->tree` for the list
+;; `(1 3 5 7 9 11)`.
+
+;; The procedure `partial-tree` works in the following recursive way:
+;; - If *n = 0* then it returns the empty list along with any remaining
+;;   elements which weren't part of the constructed tree.
+;; - If *n > 0* then the procedure first generates the left-hand side of the
+;;   tree by calling itself with `elts` and the half length of `elts`. Then, it
+;;   takes the remaining elements returned from the previous call
+;;   to itself and uses the `car` as the root value of the tree, while
+;;   generating the right-hand side of the tree using the `cdr` in the same way
+;;   as it generated the left-hand side. Lastly, it constructs the tree by
+;;   combining the left-hand side, root value and right-hand side using
+;;   `make-tree` and then returns the pair containing the tree and any remaining
+;;   elements.
+
+(list->tree '(1 3 5 7 9 11)) ;; '(5 (1 () (3 () ())) (9 (7 () ()) (11 () ())))
+;;
+;;        5
+;;    3       9
+;; 1       7     11
+
+;; b. What is the order of growth in the number of steps required by
+;; `list->tree` to convert a list of *n* elements?
+
+;; `list->tree`: *O(n)*
+
+;; ##### Exercise 2.65
+
+;; Use the results of Exercise 2.63 and Exercise 2.64 to give *Theta(n)*
+;; implementations of `union-set` and `intersection-set` for sets implemented as
+;; (balanced) binary trees.
+
+(define (union-set set1 set2)
+  (let ((list-set1 (tree->list-2 set1))
+        (list-set2 (tree->list-2 set2)))
+    (define (list-union-set set1 set2)
+      (cond ((null? set1)
+             set2)
+            ((null? set2)
+             set1)
+            (else
+             (let ((x1 (car set1))
+                   (x2 (car set2)))
+               (cond ((= x1 x2)
+                      (cons x1 (list-union-set (cdr set1) (cdr set2))))
+                     ((< x1 x2)
+                      (cons x1 (list-union-set (cdr set1) set2)))
+                     ((< x2 x1)
+                      (cons x2 (list-union-set set1 (cdr set2)))))))))
+    (list->tree (list-union-set list-set1 list-set2))))
+
+;; Test
+(union-set (list->tree '(1 3 5 6 7 8 10))
+           (list->tree '(1 2 3 4 8 9 10 11)))
+
+;; Tree pointers
+;;  6 ->  3 ,  9
+;;  3 ->  1 ,  4
+;;  1 ->  / ,  2
+;;  4 ->  / ,  5
+;;  9 ->  7 , 10
+;;  7 ->  / ,  8
+;; 10 ->  / , 11
+
+(define (intersection-set set1 set2)
+  (let ((list-set1 (tree->list-2 set1))
+        (list-set2 (tree->list-2 set2)))
+    (define (list-intersection-set set1 set2)
+      (if (or (null? set1) (null? set2))
+          '()
+          (let ((x1 (car set1))
+                (x2 (car set2)))
+            (cond ((= x1 x2)
+                   (cons x1 (list-intersection-set (cdr set1) (cdr set2))))
+                  ((< x1 x2)
+                   (list-intersection-set (cdr set1) set2))
+                  ((< x2 x1)
+                   (list-intersection-set set1 (cdr set2)))))))
+    (list->tree (list-intersection-set list-set1 list-set2))))
+
+;; Test
+(intersection-set (list->tree '(1 3 5 6 7 8 10))
+                  (list->tree '(1 2 3 4 8 9 10 11)))
+
+;; Tree pointers
+;;  3 ->  1 ,  8
+;;  8 ->  / , 10
+
+;; #### Sets as information retrieval
