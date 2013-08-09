@@ -2832,3 +2832,7 @@ x ;; '((1 2) (3 4))
          (lookup given-key (right-branch set-of-records)))))
 
 ;; ### 2.3.4 Example: Huffman Encoding Trees
+
+;; #### Generating Huffman trees
+
+;; #### Representing Huffman trees
