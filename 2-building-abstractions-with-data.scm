@@ -3066,10 +3066,10 @@ x ;; '((1 2) (3 4))
 
 (define lyrics-encoded-message (encode lyrics-message lyrics-huffman-tree))
 lyrics-encoded-message
-;; '(0 1 1 1 1 1 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-;;   0 1 1 1 1 1 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-;;   0 1 1 0 1 1 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 1 1 0
-;;   0 1 1 0 1 0)
+;; '(0 1 1 1 1 1 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1 0 0 0 0 0 0 0 0 0
+;;   0 0 0 0 0 0 0 0 0 1 1 1 1 1 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1 0
+;;   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 1 1 0 1 0 0 1 0 0 1
+;;   0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 1 1 0 0 1 1 0 1 0)
 
 ;; How many bits are required for the encoding? What is the smallest number of
 ;; bits that would be needed to encode this song if we used a fixed-length code
@@ -3092,7 +3092,7 @@ lyrics-encoded-message
 ;; bits are required to encode the most frequent symbol? The least frequent
 ;; symbol?
 
-;; TODO (Need pen, paper and a clear head).
+;; TODO: (Need pen, paper and a clear head).
 
 ;; ##### Exercise 2.72
 
@@ -3105,6 +3105,6 @@ lyrics-encoded-message
 ;; *n*) of the number of steps needed to encode the most frequent and least
 ;; frequent symbols in the alphabet.
 
-;; TODO (Need pen, paper and a clear head).
+;; TODO: (Need pen, paper and a clear head).
 
 ;; ## 2.4 Multiple Representations for Abstract Data
