@@ -2836,3 +2836,275 @@ x ;; '((1 2) (3 4))
 ;; #### Generating Huffman trees
 
 ;; #### Representing Huffman trees
+
+(define (make-leaf symbol weight)
+  (list 'leaf symbol weight))
+
+(define (leaf? object)
+  (eq? (car object) 'leaf))
+
+(define (symbol-leaf x) (cadr x))
+
+(define (weight-leaf x) (caddr x))
+
+(define (make-code-tree left right)
+  (list left
+        right
+        (append (symbols left)
+                (symbols right))
+        (+ (weight left)
+           (weight right))))
+
+(define (left-branch tree) (car tree))
+(define (right-branch tree) (cadr tree))
+
+(define (symbols tree)
+  (if (leaf? tree)
+      (list (symbol-leaf tree))
+      (caddr tree)))
+
+(define (weight tree)
+  (if (leaf? tree)
+      (weight-leaf tree)
+      (cadddr tree)))
+
+;; #### The decoding procedure
+
+(define (decode bits tree)
+  (define (decode-1 bits current-branch)
+    (if (null? bits)
+        '()
+        (let ((next-branch (choose-branch (car bits) current-branch)))
+          (if (leaf? next-branch)
+              (cons (symbol-leaf next-branch)
+                    (decode-1 (cdr bits) tree))
+              (decode-1 (cdr bits) next-branch)))))
+  (decode-1 bits tree))
+
+(define (choose-branch bit branch)
+  (cond ((= bit 0) (left-branch branch))
+        ((= bit 1) (right-branch branch))
+        (else (error "bad bit: CHOOSE-BRANCH" bit))))
+
+;; #### Sets of weighted elements
+
+(define (adjoin-set x set)
+  (cond ((null? set)
+         (list x))
+        ((< (weight x) (weight (car set)))
+         (cons x set))
+        (else
+         (cons (car set)
+               (adjoin-set x (cdr set))))))
+
+(define (make-leaf-set pairs)
+  (if (null? pairs)
+      '()
+      (let ((pair (car pairs)))
+        (adjoin-set (make-leaf (car pair) ; symbol
+                               (cadr pair)) ; frequency
+                    (make-leaf-set (cdr pairs))))))
+
+;; ##### Exercise 2.67
+
+;; Define an encoding tree and a sample message:
+
+(define sample-tree
+  (make-code-tree (make-leaf 'A 4)
+                  (make-code-tree
+                   (make-leaf 'B 2)
+                   (make-code-tree (make-leaf 'D 1)
+                                   (make-leaf 'C 1)))))
+
+(define sample-encoded-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
+
+;; Use the `decode` procedure to decode the message, and give the result.
+
+(decode sample-encoded-message sample-tree) ; '(A D A B B C A)
+
+;; ##### Exercise 2.68
+
+;; The `encode` procedure takes as arguments a message and a tree and produces
+;; the list of bits that gives the encoded message.
+
+(define (encode message tree)
+  (if (null? message)
+      '()
+      (append (encode-symbol (car message) tree)
+              (encode (cdr message) tree))))
+
+(define (encode-symbol symbol tree)
+  (if (leaf? tree)
+      (if (eq? symbol (symbol-leaf tree))
+          '()
+          (error "bad symbol: ENCODE-SYMBOL" symbol))
+      (cond ((element-of-set? symbol (symbols (left-branch tree)))
+             (cons 0 (encode-symbol symbol (left-branch tree))))
+            ((element-of-set? symbol (symbols (right-branch tree)))
+             (cons 1 (encode-symbol symbol (right-branch tree))))
+            (else
+             (error "bad symbol: ENCODE-SYMBOL" symbol)))))
+
+;; Helper function
+
+(define (element-of-set? x set)
+  (cond ((null? set)
+         #f)
+        ((equal? x (car set))
+         #t)
+        (else
+         (element-of-set? x (cdr set)))))
+
+(define sample-decoded-message '(A D A B B C A))
+(encode sample-decoded-message sample-tree) ; '(0 1 1 0 0 1 0 1 0 1 1 1 0)
+
+(equal? sample-encoded-message
+        (encode sample-decoded-message sample-tree)) ; #t
+
+(equal? sample-decoded-message
+     (decode (encode sample-decoded-message sample-tree) sample-tree)) ; #t
+
+;; ##### Exercise 2.69
+
+;; The following procedure takes as its argument a list of symbol-frequency
+;; pairs (where no symbol appears in more than one pair) and generates a Huffman
+;; encoding tree according to the Huffman algorithm.
+
+(define (generate-huffman-tree pairs)
+  (successive-merge (make-leaf-set pairs)))
+
+;; `Make-leaf-set` is the procedure given above that transforms the list of
+;; pairs into an ordered set of leaves. `Successive-merge` is the procedure you
+;; must write, using `make-code-tree` to successively merge the smallest-weight
+;; elements of the set until there is only one element left, which is the
+;; desired Huffman tree. (This procedure is slightly tricky, but not really
+;; complicated. If you find yourself designing a complex procedure, then you are
+;; almost certainly doing something wrong. You can take significant advantage of
+;; the fact that we are using an ordered set representation.)
+
+(define (successive-merge leaf-set)
+  (if (< (length leaf-set) 2)
+      leaf-set
+      (successive-merge
+       (adjoin-set (make-code-tree (car leaf-set)
+                                   (cadr leaf-set))
+                   (cddr leaf-set)))))
+
+;; Tests
+
+(define sample-frequency-list-1 '((A 4) (B 2) (D 1) (C 1)))
+
+(define sample-frequency-list-2
+  '((A 8) (B 3) (C 1) (D 1) (E 1) (F 1) (G 1) (H 1)))
+
+(generate-huffman-tree sample-frequency-list-1)
+;; '(
+;;   ((leaf A 4)
+;;    ((leaf B 2)
+;;     ((leaf C 1)
+;;      (leaf D 1)
+;;      (C D) 2)
+;;     (B C D) 4)
+;;   (A B C D) 8)
+;;  )
+
+(generate-huffman-tree sample-frequency-list-2)
+;; '(((leaf A 8)
+;; ((((leaf H 1) (leaf G 1) (H G) 2)
+;;  ((leaf F 1) (leaf E 1) (F E) 2)
+;;  (H G F E)
+;;  4)
+;;  (((leaf D 1) (leaf C 1) (D C) 2) (leaf B 3) (D C B) 5)
+;;  (H G F E D C B)
+;;  9)
+;; (A H G F E D C B)
+;; 17))
+
+;; ##### Exercise 2.70
+
+;; The following eight-symbol alphabet with associated relative frequencies
+;; was designed to efficiently encode the lyrics of 1950s rock songs. (Note
+;; that the "symbols" of an "alphabet" need not be individual letters.)
+
+;; A    2  GET 2  SHA 3  WAH 1
+;; BOOM 1  JOB 2  NA 16  YIP 9
+
+;; Use `generate-huffman-tree` (Exercise 2.69) to generate a corresponding
+;; Huffman tree, and use `encode` (Exercise 2.68) to encode the following
+;; message:
+
+;; Get a job
+;; Sha na na na na na na na na
+;; Get a job
+;; Sha na na na na na na na na
+;; Wah yip yip yip yip yip yip yip yip yip
+;; Sha boom
+
+(define lyrics-message
+  '(GET A JOB
+    SHA NA NA NA NA NA NA NA NA
+    GET A JOB
+    SHA NA NA NA NA NA NA NA NA
+    WAH YIP YIP YIP YIP YIP YIP YIP YIP YIP
+    SHA BOOM
+    ))
+
+(define lyrics-frequency-list
+  '((A 2) (GET 2) (SHA 3) (WAH 1) (BOOM 1) (JOB 2) (NA 16) (YIP 9)))
+
+(define lyrics-huffman-tree (generate-huffman-tree lyrics-frequency-list))
+;; '(((leaf NA 16)
+;;  ((leaf YIP 9)
+;;   (((leaf A 2) ((leaf BOOM 1) (leaf WAH 1) (BOOM WAH) 2) (A BOOM WAH) 4)
+;;    ((leaf SHA 3) ((leaf JOB 2) (leaf GET 2) (JOB GET) 4) (SHA JOB GET) 7)
+;;    (A BOOM WAH SHA JOB GET)
+;;    11)
+;;   (YIP A BOOM WAH SHA JOB GET)
+;;   20)
+;;  (NA YIP A BOOM WAH SHA JOB GET)
+;;  36))
+
+(define lyrics-encoded-message (encode lyrics-message lyrics-huffman-tree))
+lyrics-encoded-message
+;; '(0 1 1 1 1 1 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;;   0 1 1 1 1 1 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+;;   0 1 1 0 1 1 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 1 1 0
+;;   0 1 1 0 1 0)
+
+;; How many bits are required for the encoding? What is the smallest number of
+;; bits that would be needed to encode this song if we used a fixed-length code
+;; for the eight-symbol alphabet?
+
+;; Bits required:
+(length lyrics-encoded-message) ; 120
+
+;; Smallest number of bits needed to encode song using fixed-length code:
+
+;; There's 8 different symbols, this requires an encoding length of 3 bits
+;; (2^3 = 8) per symbol to encode the whole symbol alphabet. Since there is 36
+;; words in the lyrics, we need 3 * 36 = 108 bits.
+
+;; ##### Exercise 2.71
+
+;; Suppose we have a Huffman tree for an alphabet of *n* symbols, and that the
+;; relative frequencies of the symbols are *1, 2, 4, ..., n − 1*. Sketch the
+;; tree for *n = 5;* for *n = 10*. In such a tree (for general *n*) how many
+;; bits are required to encode the most frequent symbol? The least frequent
+;; symbol?
+
+;; TODO (Need pen, paper and a clear head).
+
+;; ##### Exercise 2.72
+
+;; Consider the encoding procedure that you designed in Exercise 2.68. What is
+;; the order of growth in the number of steps needed to encode a symbol? Be sure
+;; to include the number of steps needed to search the symbol list at each node
+;; encountered. To answer this question in general is difficult. Consider the
+;; special case where the relative frequencies of the *n* symbols are as
+;; described in Exercise 2.71, and give the order of growth (as a function of
+;; *n*) of the number of steps needed to encode the most frequent and least
+;; frequent symbols in the alphabet.
+
+;; TODO (Need pen, paper and a clear head).
+
+;; ## 2.4 Multiple Representations for Abstract Data
