@@ -12,13 +12,6 @@ The solutions have been written the Racket language.
 
 This project is still work in progress.
 
-## About
-
-- **Author:** Peter Urbak
-- **Created:** 2013-01-11
-- **Version:** 2013-08-09
-- **URL:** https://github.com/dragonwasrobot/sicp-exercises
-
 ## TODO
 
 - Exercise 2.71+72
